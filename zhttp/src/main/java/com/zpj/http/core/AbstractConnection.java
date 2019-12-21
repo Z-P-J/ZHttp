@@ -9,8 +9,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URI;
@@ -117,6 +120,12 @@ public abstract class AbstractConnection implements Connection {
     @Override
     public Connection data(String key, String filename, InputStream inputStream) {
         req.data(HttpKeyVal.create(key, filename, inputStream));
+        return this;
+    }
+
+    @Override
+    public Connection data(String key, String filename, InputStream inputStream, IHttp.OnStreamWriteListener listener) {
+        req.data(HttpKeyVal.create(key, filename, inputStream, listener));
         return this;
     }
 

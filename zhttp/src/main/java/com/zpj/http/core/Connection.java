@@ -1,21 +1,18 @@
 package com.zpj.http.core;
 
-import androidx.annotation.NonNull;
-
 import com.zpj.http.ZHttp;
 import com.zpj.http.exception.HttpStatusException;
 import com.zpj.http.exception.UncheckedIOException;
 import com.zpj.http.exception.UnsupportedMimeTypeException;
-
-import com.zpj.http.parser.html.nodes.Document;
 import com.zpj.http.parser.html.Parser;
+import com.zpj.http.parser.html.nodes.Document;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import javax.net.ssl.SSLSocketFactory;
 import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Proxy;
@@ -23,6 +20,8 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
+import javax.net.ssl.SSLSocketFactory;
 
 /**
  * A Connection provides a convenient interface to fetch content from the web, and parse them into Documents.
@@ -186,6 +185,8 @@ public interface Connection {
      */
     Connection data(String key, String filename, InputStream inputStream);
 
+    Connection data(String key, String filename, InputStream inputStream, IHttp.OnStreamWriteListener listener);
+
     /**
      * Add an input stream as a request data parameter. For GETs, has no effect, but for POSTS this will upload the
      * input stream.
@@ -316,6 +317,8 @@ public interface Connection {
 //     * @throws IOException on error
 //     */
 //    Document post() throws IOException;
+
+//    OutputStream outputStream() throws IOException;
 
     String toStr() throws IOException;
 
@@ -823,5 +826,10 @@ public interface Connection {
          * @return the current Content Type.
          */
         String contentType();
+
+        KeyVal setListener(IHttp.OnStreamWriteListener listener);
+
+        IHttp.OnStreamWriteListener getListener();
+
     }
 }

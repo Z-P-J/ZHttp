@@ -1,5 +1,7 @@
 package com.zpj.http.core;
 
+import android.util.Log;
+
 import com.zpj.http.exception.HttpStatusException;
 import com.zpj.http.exception.UncheckedIOException;
 import com.zpj.http.exception.UnsupportedMimeTypeException;
@@ -15,6 +17,9 @@ import com.zpj.http.utils.Validate;
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
+import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -95,7 +100,7 @@ public class HttpResponse extends HttpBase<Connection.Response> implements Conne
         // set up the request for execution
         String mimeBoundary = null;
         if (req.data().size() > 0 && (!methodHasBody || hasRequestBody))
-            serialiseRequestUrl(req);
+            UrlUtil.serialiseRequestUrl(req);
         else if (methodHasBody)
             mimeBoundary = setOutputContentType(req);
 
@@ -103,14 +108,26 @@ public class HttpResponse extends HttpBase<Connection.Response> implements Conne
         HttpURLConnection conn = createConnection(req);
         HttpResponse res;
         try {
-            conn.connect();
-            if (conn.getDoOutput())
-                writePost(req, conn.getOutputStream(), mimeBoundary);
+            long time1 = System.currentTimeMillis();
+            Log.d("HttpResponse", "time1=" + time1);
+            if (conn.getDoOutput()) {
+//                conn.setChunkedStreamingMode(0);
+                conn.setUseCaches(false);
+                writePost2(req, conn, mimeBoundary);
+                long time2 = System.currentTimeMillis();
+                Log.d("HttpResponse", "delta=" + (time2 - time1));
+            } else {
+                conn.connect();
+            }
 
             int status = conn.getResponseCode();
+            long time2 = System.currentTimeMillis();
+            Log.d("HttpResponse", "delta1=" + (time2 - time1));
             res = new HttpResponse(previousResponse);
             res.setupFromConnection(conn, previousResponse);
             res.req = req;
+            long time3 = System.currentTimeMillis();
+            Log.d("HttpResponse", "delta2=" + (time3 - time2));
 
             // redirect if there's a location header (from 3xx, or 201 etc)
 //                && req.followRedirects()
@@ -408,53 +425,147 @@ public class HttpResponse extends HttpBase<Connection.Response> implements Conne
         return bound;
     }
 
-    private static void writePost(final Connection.Request req, final OutputStream outputStream, final String bound) throws IOException {
-        final Collection<Connection.KeyVal> data = req.data();
-        final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(outputStream, req.postDataCharset()));
+//    private static void writePost(final Connection.Request req, final OutputStream outputStream, final String bound) throws IOException {
+//        final Collection<Connection.KeyVal> data = req.data();
+//        final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(outputStream, req.postDataCharset()));
+//
+//        if (bound != null) {
+//            // boundary will be set if we're in multipart mode
+//            for (Connection.KeyVal keyVal : data) {
+//                w.write("--");
+//                w.write(bound);
+//                w.write("\r\n");
+//                w.write("Content-Disposition: form-data; name=\"");
+//                w.write(encodeMimeName(keyVal.key())); // encodes " to %22
+//                w.write("\"");
+//                if (keyVal.hasInputStream()) {
+//                    w.write("; filename=\"");
+//                    w.write(encodeMimeName(keyVal.value()));
+//                    w.write("\"\r\nContent-Type: ");
+//                    w.write(keyVal.contentType() != null ? keyVal.contentType() : DefaultUploadType);
+//                    w.write("\r\n\r\n");
+//                    w.flush(); // flush
+//                    DataUtil.crossStreams(keyVal.inputStream(), outputStream, keyVal.getListener());
+//                    outputStream.flush();
+//                } else {
+//                    w.write("\r\n\r\n");
+//                    w.write(keyVal.value());
+//                }
+//                w.write("\r\n");
+//            }
+//            w.write("--");
+//            w.write(bound);
+//            w.write("--");
+//        } else if (req.requestBody() != null) {
+//            // data will be in query string, we're sending a plaintext body
+//            w.write(req.requestBody());
+//        }
+//        else {
+//            // regular form data (application/x-www-form-urlencoded)
+//            boolean first = true;
+//            for (Connection.KeyVal keyVal : data) {
+//                if (!first)
+//                    w.append('&');
+//                else
+//                    first = false;
+//
+//                w.write(URLEncoder.encode(keyVal.key(), req.postDataCharset()));
+//                w.write('=');
+//                w.write(URLEncoder.encode(keyVal.value(), req.postDataCharset()));
+//            }
+//        }
+//        w.close();
+//    }
 
-        if (bound != null) {
-            // boundary will be set if we're in multipart mode
-            for (Connection.KeyVal keyVal : data) {
-                w.write("--");
-                w.write(bound);
-                w.write("\r\n");
-                w.write("Content-Disposition: form-data; name=\"");
-                w.write(encodeMimeName(keyVal.key())); // encodes " to %22
-                w.write("\"");
-                if (keyVal.hasInputStream()) {
-                    w.write("; filename=\"");
-                    w.write(encodeMimeName(keyVal.value()));
-                    w.write("\"\r\nContent-Type: ");
-                    w.write(keyVal.contentType() != null ? keyVal.contentType() : DefaultUploadType);
-                    w.write("\r\n\r\n");
-                    w.flush(); // flush
-                    DataUtil.crossStreams(keyVal.inputStream(), outputStream);
-                    outputStream.flush();
+    private static long getTotalBytes(final Connection.Request req, final String bound) throws IOException {
+        String charset = req.postDataCharset();
+        byte[] boundaryBytes = ("--" + bound + "\r\n").getBytes(charset);
+        byte[] trailerBytes = ("--" + bound + "--").getBytes(charset);
+        long total = 0;
+        for (Connection.KeyVal keyVal : req.data()) {
+            total += boundaryBytes.length;
+            String multipartHeader = ("Content-Disposition: form-data; name=\"" + encodeMimeName(keyVal.key()) + "\"");
+            if (keyVal.hasInputStream()) {
+                multipartHeader += ("; filename=\"" + encodeMimeName(keyVal.value()) + "\"\r\nContent-Type: ");
+                multipartHeader += (keyVal.contentType() != null ? keyVal.contentType() : DefaultUploadType);
+                multipartHeader += "\r\n\r\n";
+                total += multipartHeader.getBytes(charset).length;
+                if (keyVal.inputStream() instanceof FileInputStream) {
+                    total += ((FileInputStream) keyVal.inputStream()).getChannel().size();
                 } else {
-                    w.write("\r\n\r\n");
-                    w.write(keyVal.value());
+                    int available = keyVal.inputStream().available();
+                    if (available < Integer.MAX_VALUE) {
+                        total += available;
+                    } else {
+                        byte[] buf = new byte[512 * 1024];
+                        int len;
+                        while ((len = keyVal.inputStream().read(buf)) > 0) {
+                            total += len;
+                        }
+                    }
                 }
-                w.write("\r\n");
+            } else {
+                multipartHeader += ("\r\n\r\n" + keyVal.value());
+                total += multipartHeader.getBytes(charset).length;
             }
-            w.write("--");
-            w.write(bound);
-            w.write("--");
-        } else if (req.requestBody() != null) {
-            // data will be in query string, we're sending a plaintext body
-            w.write(req.requestBody());
+            total += "\r\n".getBytes(charset).length;
         }
-        else {
+        total += trailerBytes.length;
+        Log.d("HttpResponse", "total=" + total);
+        return total;
+    }
+
+    private static void writePost2(final Connection.Request req, final HttpURLConnection conn, final String bound) throws IOException {
+        final Collection<Connection.KeyVal> data = req.data();
+        String charset = req.postDataCharset();
+
+//        final BufferedWriter w = new BufferedWriter(new OutputStreamWriter(outputStream, req.postDataCharset()));
+
+        OutputStream w;
+        if (bound != null) {
+            conn.setFixedLengthStreamingMode(getTotalBytes(req, bound));
+            Log.d("HttpResponse", "setFixedLengthStreamingMode finished");
+            w = conn.getOutputStream();
+            // boundary will be set if we're in multipart mode
+            byte[] boundaryBytes = ("--" + bound + "\r\n").getBytes(charset);
+            byte[] trailerBytes = ("--" + bound + "--").getBytes(charset);
+            for (Connection.KeyVal keyVal : data) {
+                w.write(boundaryBytes);
+                String multipartHeader = "Content-Disposition: form-data; name=\"" + encodeMimeName(keyVal.key()) + "\"";
+                if (keyVal.hasInputStream()) {
+
+                    multipartHeader += "; filename=\"" + encodeMimeName(keyVal.value()) + "\"\r\nContent-Type: ";
+                    multipartHeader += keyVal.contentType() != null ? keyVal.contentType() : DefaultUploadType;
+                    multipartHeader += "\r\n\r\n";
+                    w.write(multipartHeader.getBytes(charset));
+
+                    Log.d("HttpResponse", "crossStreams");
+                    DataUtil.crossStreams(keyVal.inputStream(), w, keyVal.getListener());
+                    w.flush();
+                } else {
+                    multipartHeader += ("\r\n\r\n" + keyVal.value());
+                    w.write(multipartHeader.getBytes(charset));
+                }
+                w.write("\r\n".getBytes(charset));
+            }
+            w.write(trailerBytes);
+        } else if (req.requestBody() != null) {
+            w = conn.getOutputStream();
+            // data will be in query string, we're sending a plaintext body
+            w.write(req.requestBody().getBytes(charset));
+        } else {
+            w = conn.getOutputStream();
             // regular form data (application/x-www-form-urlencoded)
             boolean first = true;
             for (Connection.KeyVal keyVal : data) {
                 if (!first)
-                    w.append('&');
+                    w.write("&".getBytes(charset));
                 else
                     first = false;
 
-                w.write(URLEncoder.encode(keyVal.key(), req.postDataCharset()));
-                w.write('=');
-                w.write(URLEncoder.encode(keyVal.value(), req.postDataCharset()));
+                w.write(URLEncoder.encode(keyVal.key(), req.postDataCharset()).getBytes(charset));
+                w.write("=".getBytes(charset));
+                w.write(URLEncoder.encode(keyVal.value(), req.postDataCharset()).getBytes(charset));
             }
         }
         w.close();
@@ -472,37 +583,6 @@ public class HttpResponse extends HttpBase<Connection.Response> implements Conne
             // todo: spec says only ascii, no escaping / encoding defined. validate on set? or escape somehow here?
         }
         return StringUtil.releaseBuilder(sb);
-    }
-
-    // for get url reqs, serialise the data map into the url
-    private static void serialiseRequestUrl(Connection.Request req) throws IOException {
-        URL in = req.url();
-        StringBuilder url = StringUtil.borrowBuilder();
-        boolean first = true;
-        // reconstitute the query, ready for appends
-        url
-                .append(in.getProtocol())
-                .append("://")
-                .append(in.getAuthority()) // includes host, port
-                .append(in.getPath())
-                .append("?");
-        if (in.getQuery() != null) {
-            url.append(in.getQuery());
-            first = false;
-        }
-        for (Connection.KeyVal keyVal : req.data()) {
-            Validate.isFalse(keyVal.hasInputStream(), "InputStream data not supported in URL query string.");
-            if (!first)
-                url.append('&');
-            else
-                first = false;
-            url
-                    .append(URLEncoder.encode(keyVal.key(), DataUtil.defaultCharset))
-                    .append('=')
-                    .append(URLEncoder.encode(keyVal.value(), DataUtil.defaultCharset));
-        }
-        req.url(new URL(StringUtil.releaseBuilder(url)));
-        req.data().clear(); // moved into url as get params
     }
 
     private static String encodeMimeName(String val) {

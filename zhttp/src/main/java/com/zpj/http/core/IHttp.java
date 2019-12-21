@@ -14,4 +14,11 @@ public interface IHttp {
         void onSuccess();
     }
 
+    interface OnStreamWriteListener {
+        /**
+         * Called every time that a bunch of bytes were written to the body
+         * @param bytesWritten number of written bytes
+         */
+        void onBytesWritten(int bytesWritten);
+    }
 }

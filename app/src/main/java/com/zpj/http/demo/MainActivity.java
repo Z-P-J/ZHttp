@@ -7,6 +7,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.zpj.http.ZHttp;
+import com.zpj.http.core.IHttp;
 
 import java.io.IOException;
 
@@ -69,6 +70,13 @@ public class MainActivity extends AppCompatActivity {
                     final String b = ZHttp.get("https://api.heweather.com/x3/weather")
                             .data("city", "beijing")
                             .data("key", "d17ce22ec5404ed883e1cfcaca0ecaa7")
+                            .onRedirect(new IHttp.OnRedirectListener() {
+                                @Override
+                                public boolean onRedirect(String redirectUrl) {
+                                    Log.d("onRedirect", "redirectUrl=" + redirectUrl);
+                                    return true;
+                                }
+                            })
                             .toStr();
                     contentText.post(new Runnable() {
                         @Override

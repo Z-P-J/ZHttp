@@ -1,5 +1,8 @@
 package com.zpj.http.utils;
 
+import android.util.Log;
+
+import com.zpj.http.core.IHttp;
 import com.zpj.http.exception.UncheckedIOException;
 import com.zpj.http.io.ConstrainableInputStream;
 import com.zpj.http.parser.html.nodes.Comment;
@@ -11,6 +14,8 @@ import com.zpj.http.parser.html.Parser;
 import com.zpj.http.parser.html.select.Elements;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -34,7 +39,7 @@ public final class DataUtil {
     private static final Pattern charsetPattern = Pattern.compile("(?i)\\bcharset=\\s*(?:[\"'])?([^\\s,;\"']*)");
     public static final String defaultCharset = "UTF-8"; // used if not found in header or meta charset
     private static final int firstReadBufferSize = 1024 * 5;
-    public static final int bufferSize = 1024 * 32;
+    public static final int bufferSize = 1024 * 512; // 1024 * 32
     private static final char[] mimeBoundaryChars =
             "-_1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".toCharArray();
     static final int boundaryLength = 32;
@@ -78,17 +83,36 @@ public final class DataUtil {
         return parseInputStream(in, charsetName, baseUri, parser);
     }
 
+//    /**
+//     * Writes the input stream to the output stream. Doesn't close them.
+//     * @param in input stream to read from
+//     * @param out output stream to write to
+//     * @throws IOException on IO error
+//     */
+//    public static void crossStreams(final InputStream in, final OutputStream out) throws IOException {
+//        crossStreams(in, out, null);
+//    }
+
     /**
      * Writes the input stream to the output stream. Doesn't close them.
      * @param in input stream to read from
      * @param out output stream to write to
      * @throws IOException on IO error
      */
-    public static void crossStreams(final InputStream in, final OutputStream out) throws IOException {
+    public static void crossStreams(final InputStream in, final OutputStream out, IHttp.OnStreamWriteListener listener) throws IOException {
         final byte[] buffer = new byte[bufferSize];
         int len;
-        while ((len = in.read(buffer)) != -1) {
+        while ((len = in.read(buffer, 0, buffer.length)) != -1) {
+            Log.d("HttpResponse", "len=" + len);
             out.write(buffer, 0, len);
+            Log.d("HttpResponse", "write");
+            out.flush();
+            Log.d("HttpResponse", "flush");
+            if (listener != null) {
+                Log.d("HttpResponse", "onBytesWritten");
+                listener.onBytesWritten(len);
+            }
+            Log.d("HttpResponse", "----------------------------------------------");
         }
     }
 

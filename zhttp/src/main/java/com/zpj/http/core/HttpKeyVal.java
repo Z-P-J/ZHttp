@@ -10,6 +10,7 @@ public class HttpKeyVal implements Connection.KeyVal {
     private String value;
     private InputStream stream;
     private String contentType;
+    private IHttp.OnStreamWriteListener listener;
 
     public static HttpKeyVal create(String key, String value) {
         return new HttpKeyVal().key(key).value(value);
@@ -17,6 +18,10 @@ public class HttpKeyVal implements Connection.KeyVal {
 
     public static HttpKeyVal create(String key, String filename, InputStream stream) {
         return new HttpKeyVal().key(key).value(filename).inputStream(stream);
+    }
+
+    public static HttpKeyVal create(String key, String filename, InputStream stream, IHttp.OnStreamWriteListener listener) {
+        return new HttpKeyVal().key(key).value(filename).inputStream(stream).setListener(listener);
     }
 
     private HttpKeyVal() {}
@@ -65,6 +70,17 @@ public class HttpKeyVal implements Connection.KeyVal {
     @Override
     public String contentType() {
         return contentType;
+    }
+
+    @Override
+    public IHttp.OnStreamWriteListener getListener() {
+        return listener;
+    }
+
+    @Override
+    public HttpKeyVal setListener(IHttp.OnStreamWriteListener listener) {
+        this.listener = listener;
+        return this;
     }
 
     @Override
