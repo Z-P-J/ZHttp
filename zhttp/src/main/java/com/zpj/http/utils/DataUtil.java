@@ -103,16 +103,20 @@ public final class DataUtil {
         final byte[] buffer = new byte[bufferSize];
         int len;
         while ((len = in.read(buffer, 0, buffer.length)) != -1) {
-            Log.d("HttpResponse", "len=" + len);
-            out.write(buffer, 0, len);
-            Log.d("HttpResponse", "write");
-            out.flush();
-            Log.d("HttpResponse", "flush");
-            if (listener != null) {
-                Log.d("HttpResponse", "onBytesWritten");
+            if (listener.shouldContinue()) {
+                Log.d("crossStreams", "len=" + len);
+                out.write(buffer, 0, len);
+                Log.d("crossStreams", "write");
+                out.flush();
+                Log.d("crossStreams", "flush");
+                Log.d("crossStreams", "onBytesWritten");
                 listener.onBytesWritten(len);
+                Log.d("crossStreams", "----------------------------------------------");
+            } else {
+                Log.d("crossStreams", "stop");
+                throw new IOException("Stop Post by User!");
             }
-            Log.d("HttpResponse", "----------------------------------------------");
+
         }
     }
 

@@ -194,6 +194,7 @@ public class HttpResponse extends HttpBase<Connection.Response> implements Conne
         } catch (IOException e){
             // per Java's documentation, this is not necessary, and precludes keepalives. However in practice,
             // connection errors will not be released quickly enough and can cause a too many open files error.
+            e.printStackTrace();
             conn.disconnect();
             throw e;
         }

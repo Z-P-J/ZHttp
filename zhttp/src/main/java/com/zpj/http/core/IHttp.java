@@ -20,5 +20,7 @@ public interface IHttp {
          * @param bytesWritten number of written bytes
          */
         void onBytesWritten(int bytesWritten);
+
+        boolean shouldContinue();
     }
 }
