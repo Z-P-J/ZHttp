@@ -34,7 +34,7 @@ public abstract class AbstractConnection implements Connection {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
-//    protected IHttp.OnRedirectListener onRedirectListener;
+    //    protected IHttp.OnRedirectListener onRedirectListener;
     protected IHttp.OnSuccessListener onSuccessListener;
     protected IHttp.OnErrorListener onErrorListener;
 
@@ -245,28 +245,31 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public String toStr() throws IOException {
-        return execute().body();
+        res = execute();
+        return res.body();
     }
 
     @Override
     public Document toHtml() throws IOException {
-        execute();
+        res = execute();
         return res.parse();
     }
 
     @Override
     public JSONObject toJsonObject() throws IOException, JSONException {
-        return new JSONObject(execute().body());
+        res = execute();
+        return new JSONObject(res.body());
     }
 
     @Override
     public JSONArray toJsonArray() throws IOException, JSONException {
-        return new JSONArray(execute().body());
+        res = execute();
+        return new JSONArray(res.body());
     }
 
     @Override
     public Document toXml() throws IOException {
-        execute();
+        res = execute();
         return res.parse();
     }
 
@@ -321,9 +324,9 @@ public abstract class AbstractConnection implements Connection {
 
     //-----------------------------------------------------abstract methods-----------------------------------------------------
     public abstract Request createRequest();
-//    public abstract Response createResponse();
+    //    public abstract Response createResponse();
     public abstract Connection.Response execute() throws IOException;
 
     //-------------------------------------------------static methods---------------------------------------------------------
-    
+
 }
