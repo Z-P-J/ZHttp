@@ -3,6 +3,7 @@ package com.zpj.http.demo;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -100,12 +101,16 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .toStr()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
                 .onSuccess(new IHttp.OnSuccessListener<String>() {
                     @Override
                     public void onSuccess(String data) {
                         contentText.setText(data);
+                    }
+                })
+                .onError(new IHttp.OnErrorListener() {
+                    @Override
+                    public void onError(Throwable throwable) {
+                        Toast.makeText(MainActivity.this, "出错了：" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
                     }
                 })
                 .subscribe();
