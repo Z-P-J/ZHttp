@@ -13,7 +13,7 @@ public interface IHttp {
     }
 
     interface OnSuccessListener<T> {
-        void onSuccess(T data);
+        void onSuccess(T data) throws Exception;
     }
 
     interface OnCompleteListener {

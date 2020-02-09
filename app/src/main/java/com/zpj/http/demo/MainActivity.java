@@ -8,6 +8,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zpj.http.ZHttp;
+import com.zpj.http.core.HttpObservable;
 import com.zpj.http.core.IHttp;
 
 import io.reactivex.Scheduler;
@@ -101,6 +102,23 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .toStr()
+                .onNext(new HttpObservable.OnNextListener<String, String>() { // 网络请求嵌套
+                    @Override
+                    public HttpObservable<String> onNext(String data) {
+                        Log.d(TAG, "data=" + data);
+                        return ZHttp.get("https://api.heweather.com/x3/weather")
+                                .data("city", "beijing")
+                                .data("key", "d17ce22ec5404ed883e1cfcaca0ecaa7")
+                                .onRedirect(new IHttp.OnRedirectListener() {
+                                    @Override
+                                    public boolean onRedirect(String redirectUrl) {
+                                        Log.d("onRedirect", "redirectUrl=" + redirectUrl);
+                                        return true;
+                                    }
+                                })
+                                .toStr();
+                    }
+                })
                 .onSuccess(new IHttp.OnSuccessListener<String>() {
                     @Override
                     public void onSuccess(String data) {
