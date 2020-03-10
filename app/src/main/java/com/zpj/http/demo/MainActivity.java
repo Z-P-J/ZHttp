@@ -8,12 +8,20 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.zpj.http.ZHttp;
-import com.zpj.http.core.HttpObservable;
+import com.zpj.http.core.Connection;
+import com.zpj.http.core.HttpHeader;
+import com.zpj.http.core.ObservableTask;
 import com.zpj.http.core.IHttp;
+import com.zpj.http.parser.html.nodes.Document;
 
-import io.reactivex.Scheduler;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.schedulers.Schedulers;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.net.Proxy;
+import java.util.Map;
+
+import io.reactivex.disposables.Disposable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -102,9 +110,9 @@ public class MainActivity extends AppCompatActivity {
                     }
                 })
                 .toStr()
-                .onNext(new HttpObservable.OnNextListener<String, String>() { // 网络请求嵌套
+                .onNext(new ObservableTask.OnNextListener<String, String>() { // 网络请求嵌套
                     @Override
-                    public HttpObservable<String> onNext(String data) {
+                    public ObservableTask<String> onNext(String data) {
                         Log.d(TAG, "data=" + data);
                         return ZHttp.get("https://api.heweather.com/x3/weather")
                                 .data("city", "beijing")
@@ -119,6 +127,12 @@ public class MainActivity extends AppCompatActivity {
                                 .toStr();
                     }
                 })
+                .onSubscribe(new IHttp.OnSubscribeListener() {
+                    @Override
+                    public void onSubscribe(Disposable d) throws Exception {
+
+                    }
+                })
                 .onSuccess(new IHttp.OnSuccessListener<String>() {
                     @Override
                     public void onSuccess(String data) {
@@ -129,6 +143,12 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable throwable) {
                         Toast.makeText(MainActivity.this, "出错了：" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .onComplete(new IHttp.OnCompleteListener() {
+                    @Override
+                    public void onComplete() throws Exception {
+
                     }
                 })
                 .subscribe();

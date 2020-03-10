@@ -1,9 +1,7 @@
 package com.zpj.http.core;
 
 import com.zpj.http.ZHttp;
-import com.zpj.http.exception.HttpStatusException;
 import com.zpj.http.exception.UncheckedIOException;
-import com.zpj.http.exception.UnsupportedMimeTypeException;
 import com.zpj.http.parser.html.Parser;
 import com.zpj.http.parser.html.nodes.Document;
 
@@ -12,7 +10,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedInputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Proxy;
@@ -122,6 +119,29 @@ public interface Connection {
     Connection referer(String referer);
 
     Connection contentType(String contentType);
+
+    Connection acceptLanguage(String acceptLanguage);
+
+    Connection host(String host);
+
+    Connection accept(String accept);
+
+    Connection acceptEncoding(String acceptEncoding);
+
+    Connection connection(String connection);
+
+    Connection range(String range);
+
+    Connection contentLength(String contentLength);
+
+    Connection contentMD5(String contentMD5);
+
+    Connection from(String from);
+
+    Connection xRequestedWith(String xRequestedWith);
+
+    Connection acceptCharset(String acceptCharset);
+
 
 //    /**
 //     * Configures the connection to (not) follow server redirects. By default this is <b>true</b>.
@@ -341,38 +361,38 @@ public interface Connection {
 
 //    OutputStream outputStream() throws IOException;
 
-//    /**
-//     * Execute the request.
-//     * @return a response object
-//     * @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
-//     * @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
-//     * @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
-//     * @throws java.net.SocketTimeoutException if the connection times out
-//     * @throws IOException on error
-//     */
-//    Response execute() throws IOException;
+    /**
+     * Execute the request.
+     * @return a response object
+     * @throws java.net.MalformedURLException if the request URL is not a HTTP or HTTPS URL, or is otherwise malformed
+     * @throws HttpStatusException if the response is not OK and HTTP response errors are not ignored
+     * @throws UnsupportedMimeTypeException if the response mime type is not supported and those errors are not ignored
+     * @throws java.net.SocketTimeoutException if the connection times out
+     * @throws IOException on error
+     */
+    Response syncExecute() throws IOException;
 
-//    String toStr() throws IOException;
-//
-//    Document toHtml() throws IOException;
-//
-//    JSONObject toJsonObject() throws IOException, JSONException;
-//
-//    JSONArray toJsonArray() throws IOException, JSONException;
-//
-//    Document toXml() throws IOException;
+    String syncToStr() throws IOException;
 
-    HttpObservable<Response> execute();
+    Document syncToHtml() throws IOException;
 
-    HttpObservable<String> toStr();
+    JSONObject syncToJsonObject() throws IOException, JSONException;
 
-    HttpObservable<Document> toHtml();
+    JSONArray syncToJsonArray() throws IOException, JSONException;
 
-    HttpObservable<JSONObject> toJsonObject();
+    Document syncToXml() throws IOException;
 
-    HttpObservable<JSONArray> toJsonArray();
+    ObservableTask<Response> execute();
 
-    HttpObservable<Document> toXml();
+    ObservableTask<String> toStr();
+
+    ObservableTask<Document> toHtml();
+
+    ObservableTask<JSONObject> toJsonObject();
+
+    ObservableTask<JSONArray> toJsonArray();
+
+    ObservableTask<Document> toXml();
 
     Connection onRedirect(IHttp.OnRedirectListener listener);
 
@@ -557,6 +577,8 @@ public interface Connection {
          * @return cookies
          */
         Map<String, String> cookies();
+
+        String cookieStr();
     }
 
     /**

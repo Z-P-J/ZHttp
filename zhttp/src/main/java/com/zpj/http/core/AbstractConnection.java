@@ -1,5 +1,7 @@
 package com.zpj.http.core;
 
+import android.text.TextUtils;
+
 import com.zpj.http.parser.html.Parser;
 import com.zpj.http.parser.html.nodes.Document;
 import com.zpj.http.utils.UrlUtil;
@@ -24,13 +26,6 @@ import io.reactivex.ObservableEmitter;
 import io.reactivex.ObservableOnSubscribe;
 
 public abstract class AbstractConnection implements Connection {
-
-    //    protected IHttp.OnRedirectListener onRedirectListener;
-//    protected IHttp.OnSubscribeListener onSubscribeListener;
-//    protected IHttp.OnSuccessListener onSuccessListener;
-//    protected IHttp.OnErrorListener onErrorListener;
-//    protected IHttp.OnCompleteListener onCompleteListener;
-
 
     protected final Request req;
     protected Response res;
@@ -243,39 +238,44 @@ public abstract class AbstractConnection implements Connection {
         return res;
     }
 
-//    @Override
-//    public String toStr() throws IOException {
-//        res = execute();
-//        return res.body();
-//    }
-//
-//    @Override
-//    public Document toHtml() throws IOException {
-//        res = execute();
-//        return res.parse();
-//    }
-//
-//    @Override
-//    public JSONObject toJsonObject() throws IOException, JSONException {
-//        res = execute();
-//        return new JSONObject(res.body());
-//    }
-//
-//    @Override
-//    public JSONArray toJsonArray() throws IOException, JSONException {
-//        res = execute();
-//        return new JSONArray(res.body());
-//    }
-//
-//    @Override
-//    public Document toXml() throws IOException {
-//        res = execute();
-//        return res.parse();
-//    }
+    @Override
+    public Response syncExecute() throws IOException {
+        return onExecute();
+    }
+
+    @Override
+    public String syncToStr() throws IOException {
+        res = onExecute();
+        return res.body();
+    }
+
+    @Override
+    public Document syncToHtml() throws IOException {
+        res = onExecute();
+        return res.parse();
+    }
+
+    @Override
+    public JSONObject syncToJsonObject() throws IOException, JSONException {
+        res = onExecute();
+        return new JSONObject(res.body());
+    }
+
+    @Override
+    public JSONArray syncToJsonArray() throws IOException, JSONException {
+        res = onExecute();
+        return new JSONArray(res.body());
+    }
+
+    @Override
+    public Document syncToXml() throws IOException {
+        res = onExecute();
+        return res.parse();
+    }
 
 
     @Override
-    public final HttpObservable<Response> execute() {
+    public final ObservableTask<Response> execute() {
         Observable<Response> observable = Observable.create(new ObservableOnSubscribe<Response>() {
 
             @Override
@@ -285,11 +285,11 @@ public abstract class AbstractConnection implements Connection {
                 emitter.onComplete();
             }
         });
-        return new HttpObservable<>(observable);
+        return new ObservableTask<>(observable);
     }
 
     @Override
-    public final HttpObservable<String> toStr() {
+    public final ObservableTask<String> toStr() {
         Observable<String> observable = Observable.create(new ObservableOnSubscribe<String>() {
 
             @Override
@@ -299,11 +299,11 @@ public abstract class AbstractConnection implements Connection {
                 emitter.onComplete();
             }
         });
-        return new HttpObservable<>(observable);
+        return new ObservableTask<>(observable);
     }
 
     @Override
-    public final HttpObservable<Document> toHtml() {
+    public final ObservableTask<Document> toHtml() {
         Observable<Document> observable = Observable.create(new ObservableOnSubscribe<Document>() {
 
             @Override
@@ -314,11 +314,11 @@ public abstract class AbstractConnection implements Connection {
                 emitter.onComplete();
             }
         });
-        return new HttpObservable<>(observable);
+        return new ObservableTask<>(observable);
     }
 
     @Override
-    public final HttpObservable<JSONObject> toJsonObject() {
+    public final ObservableTask<JSONObject> toJsonObject() {
         Observable<JSONObject> observable = Observable.create(new ObservableOnSubscribe<JSONObject>() {
 
             @Override
@@ -329,11 +329,11 @@ public abstract class AbstractConnection implements Connection {
                 emitter.onComplete();
             }
         });
-        return new HttpObservable<>(observable);
+        return new ObservableTask<>(observable);
     }
 
     @Override
-    public final HttpObservable<JSONArray> toJsonArray() {
+    public final ObservableTask<JSONArray> toJsonArray() {
         Observable<JSONArray> observable = Observable.create(new ObservableOnSubscribe<JSONArray>() {
 
             @Override
@@ -344,11 +344,11 @@ public abstract class AbstractConnection implements Connection {
                 emitter.onComplete();
             }
         });
-        return new HttpObservable<>(observable);
+        return new ObservableTask<>(observable);
     }
 
     @Override
-    public final HttpObservable<Document> toXml() {
+    public final ObservableTask<Document> toXml() {
         Observable<Document> observable = Observable.create(new ObservableOnSubscribe<Document>() {
 
             @Override
@@ -359,7 +359,7 @@ public abstract class AbstractConnection implements Connection {
                 emitter.onComplete();
             }
         });
-        return new HttpObservable<>(observable);
+        return new ObservableTask<>(observable);
     }
 
 
@@ -400,22 +400,113 @@ public abstract class AbstractConnection implements Connection {
 
     @Override
     public Connection userAgent(String userAgent) {
-        Validate.notNull(userAgent, "User-Agent must not be null");
-        req.header(HttpHeader.USER_AGENT, userAgent);
+        if (!TextUtils.isEmpty(userAgent)) {
+            req.header(HttpHeader.USER_AGENT, userAgent);
+        }
         return this;
     }
 
     @Override
     public Connection referer(String referer) {
-        Validate.notNull(referer, "Referrer must not be null");
-        req.header(HttpHeader.REFERER, referer);
+        if (!TextUtils.isEmpty(referer)) {
+            req.header(HttpHeader.REFERER, referer);
+        }
         return this;
     }
 
     @Override
     public Connection contentType(String contentType) {
-        Validate.notNull(contentType, "Content-Type must not be null");
-        req.header(HttpHeader.CONTENT_TYPE, contentType);
+        if (!TextUtils.isEmpty(contentType)) {
+            req.header(HttpHeader.CONTENT_TYPE, contentType);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection acceptLanguage(String acceptLanguage) {
+        if (!TextUtils.isEmpty(acceptLanguage)) {
+            req.header(HttpHeader.ACCEPT_LANGUAGE, acceptLanguage);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection host(String host) {
+        if (!TextUtils.isEmpty(host)) {
+            req.header(HttpHeader.HOST, host);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection accept(String accept) {
+        if (!TextUtils.isEmpty(accept)) {
+            req.header(HttpHeader.ACCEPT, accept);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection acceptEncoding(String acceptEncoding) {
+        if (!TextUtils.isEmpty(acceptEncoding)) {
+            req.header(HttpHeader.ACCEPT_ENCODING, acceptEncoding);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection connection(String connection) {
+        if (!TextUtils.isEmpty(connection)) {
+            req.header(HttpHeader.CONNECTION, connection);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection range(String range) {
+        if (!TextUtils.isEmpty(range)) {
+            req.header(HttpHeader.RANGE, range);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection contentLength(String contentLength) {
+        if (!TextUtils.isEmpty(contentLength)) {
+            req.header(HttpHeader.CONTENT_LENGTH, contentLength);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection contentMD5(String contentMD5) {
+        if (!TextUtils.isEmpty(contentMD5)) {
+            req.header(HttpHeader.CONTENT_MD5, contentMD5);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection from(String from) {
+        if (!TextUtils.isEmpty(from)) {
+            req.header(HttpHeader.FROM, from);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection xRequestedWith(String xRequestedWith) {
+        if (!TextUtils.isEmpty(xRequestedWith)) {
+            req.header(HttpHeader.X_REQUESTED_WITH, xRequestedWith);
+        }
+        return this;
+    }
+
+    @Override
+    public Connection acceptCharset(String acceptCharset) {
+        if (!TextUtils.isEmpty(acceptCharset)) {
+            req.header(HttpHeader.ACCEPT_CHARSET, acceptCharset);
+        }
         return this;
     }
 

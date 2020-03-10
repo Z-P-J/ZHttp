@@ -1,17 +1,16 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.novoda.bintray-release'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
 
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 28
         versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        versionName "1.0.0"
         consumerProguardFiles 'consumer-rules.pro'
     }
 
@@ -22,16 +21,19 @@ android {
         }
     }
 
+    publish {
+        artifactId = 'ZHttp'
+        userOrg = 'z-p-j'
+        groupId = 'com.zpj.http'
+        publishVersion = '1.0.0'
+        desc = 'A Simple Android Network Library.'
+        website = 'https://github.com/Z-P-J/ZHttp'
+        licences = ['Apache-2.0']
+    }
+
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-
-    implementation 'androidx.appcompat:appcompat:1.1.0'
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-
 //    implementation("com.squareup.okhttp3:okhttp:4.2.2")
     implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'

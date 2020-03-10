@@ -1,2 +1,2 @@
-include ':app', ':zhttp', 'easyokhttp'
+include ':app', ':zhttp', ':easyokhttp', ':parser'
 rootProject.name='ZHttp'
