@@ -1,6 +1,8 @@
 package com.zpj.http.utils;
 
-import com.zpj.http.core.Connection;
+import com.zpj.http.core.HttpConfig;
+import com.zpj.http.core.IHttp;
+import com.zpj.http.parser.html.utils.DataUtil;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -38,9 +40,40 @@ public class UrlUtil {
         }
     }
 
+//    // for get url reqs, serialise the data map into the url
+//    public static void serialiseRequestUrl(BaseRequest req) throws IOException {
+//        URL in = req.url();
+//        StringBuilder url = StringUtil.borrowBuilder();
+//        boolean first = true;
+//        // reconstitute the query, ready for appends
+//        url
+//                .append(in.getProtocol())
+//                .append("://")
+//                .append(in.getAuthority()) // includes host, port
+//                .append(in.getPath())
+//                .append("?");
+//        if (in.getQuery() != null) {
+//            url.append(in.getQuery());
+//            first = false;
+//        }
+//        for (Connection.KeyVal keyVal : req.data()) {
+//            Validate.isFalse(keyVal.hasInputStream(), "InputStream data not supported in URL query string.");
+//            if (!first)
+//                url.append('&');
+//            else
+//                first = false;
+//            url
+//                    .append(URLEncoder.encode(keyVal.key(), DataUtil.defaultCharset))
+//                    .append('=')
+//                    .append(URLEncoder.encode(keyVal.value(), DataUtil.defaultCharset));
+//        }
+//        req.url(new URL(StringUtil.releaseBuilder(url)));
+//        req.data().clear(); // moved into url as get params
+//    }
+
     // for get url reqs, serialise the data map into the url
-    public static void serialiseRequestUrl(Connection.Request req) throws IOException {
-        URL in = req.url();
+    public static void serialiseRequestUrl(HttpConfig config) throws IOException {
+        URL in = config.url();
         StringBuilder url = StringUtil.borrowBuilder();
         boolean first = true;
         // reconstitute the query, ready for appends
@@ -54,7 +87,7 @@ public class UrlUtil {
             url.append(in.getQuery());
             first = false;
         }
-        for (Connection.KeyVal keyVal : req.data()) {
+        for (IHttp.KeyVal keyVal : config.data()) {
             Validate.isFalse(keyVal.hasInputStream(), "InputStream data not supported in URL query string.");
             if (!first)
                 url.append('&');
@@ -65,8 +98,8 @@ public class UrlUtil {
                     .append('=')
                     .append(URLEncoder.encode(keyVal.value(), DataUtil.defaultCharset));
         }
-        req.url(new URL(StringUtil.releaseBuilder(url)));
-        req.data().clear(); // moved into url as get params
+        config.url(new URL(StringUtil.releaseBuilder(url)));
+        config.data().clear(); // moved into url as get params
     }
 
 }

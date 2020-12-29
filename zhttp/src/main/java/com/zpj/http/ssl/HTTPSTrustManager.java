@@ -1,5 +1,7 @@
 package com.zpj.http.ssl;
 
+import android.content.Context;
+
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
@@ -68,4 +70,5 @@ public class HTTPSTrustManager implements X509TrustManager {
         }
         HttpsURLConnection.setDefaultSSLSocketFactory(context.getSocketFactory());
     }
+
 }

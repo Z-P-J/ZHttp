@@ -1,11 +1,11 @@
 # ZHttp
- Android网络请求框架（完善中），基于Jsoup开发，支持Jsoup所有功能，支持网页或XML解析，支持RxJava，支持链接重定向监听等
+ Android网络请求框架（完善中），基于Jsoup开发，支持Jsoup所有功能，支持Html和XML解析，支持get、post、put、head、delete等网络请求，支持RxJava，支持链接重定向监听，上传文件等功能
 
 ## How to use?
 
     1. 添加依赖
     dependencies {
-        implementation 'com.zpj.http:ZHttp:1.0.0'
+        implementation 'com.zpj.http:ZHttp:1.0.1'
 
         // 如果需要使用RxJava，请添加以下依赖
         implementation 'io.reactivex.rxjava2:rxjava:2.2.17'
@@ -17,8 +17,8 @@
                 @Override
                 public void run() {
                     try {
-                        // Connection.Response对象
-                        Connection.Response res = ZHttp.get("Your url")
+                        // IHttp.Response对象
+                        IHttp.Response res = ZHttp.get("Your url")
                                 .data("city", "chongqing")
                                 .data("key", "123456")
                                 .onRedirect(new IHttp.OnRedirectListener() {
@@ -75,22 +75,22 @@
                     .data("key", "d17ce22ec5404ed883e1cfcaca0ecaa7")
                     .onRedirect(new IHttp.OnRedirectListener() {
                         @Override
-                        public boolean onRedirect(String redirectUrl) {
+                        public boolean onRedirect(int redirectCount, String redirectUrl) {
                             Log.d("onRedirect", "redirectUrl=" + redirectUrl);
                             return true;
                         }
                     })
                     .toStr()
-                    .onNext(new ObservableTask.OnNextListener<String, String>() { // 网络请求嵌套
+                    .onNext(new HttpObserver.OnNextListener<String, String>() { // 网络请求嵌套
                         @Override
-                        public ObservableTask<String> onNext(String data) {
+                        public HttpObserver<String> onNext(String data) {
                             Log.d(TAG, "data=" + data);
                             return ZHttp.get("https://api.heweather.com/x3/weather")
                                     .data("city", "beijing")
                                     .data("key", "d17ce22ec5404ed883e1cfcaca0ecaa7")
                                     .onRedirect(new IHttp.OnRedirectListener() {
                                         @Override
-                                        public boolean onRedirect(String redirectUrl) {
+                                        public boolean onRedirect(int redirectCount, String redirectUrl) {
                                             Log.d("onRedirect", "redirectUrl=" + redirectUrl);
                                             return true;
                                         }

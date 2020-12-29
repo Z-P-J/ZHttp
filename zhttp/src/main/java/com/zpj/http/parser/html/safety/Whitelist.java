@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static com.zpj.http.utils.Normalizer.lowerCase;
+import static com.zpj.http.parser.html.utils.Normalizer.lowerCase;
 
 
 /**

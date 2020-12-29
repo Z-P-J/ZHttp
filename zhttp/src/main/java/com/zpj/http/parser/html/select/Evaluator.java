@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.zpj.http.utils.Normalizer.lowerCase;
-import static com.zpj.http.utils.Normalizer.normalize;
+import static com.zpj.http.parser.html.utils.Normalizer.lowerCase;
+import static com.zpj.http.parser.html.utils.Normalizer.normalize;
 
 
 /**

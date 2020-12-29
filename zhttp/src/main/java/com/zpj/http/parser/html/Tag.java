@@ -1,7 +1,7 @@
 package com.zpj.http.parser.html;
 
 import com.zpj.http.utils.Validate;
-import com.zpj.http.utils.Normalizer;
+import com.zpj.http.parser.html.utils.Normalizer;
 
 import java.util.HashMap;
 import java.util.Map;

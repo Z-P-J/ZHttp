@@ -1,6 +1,7 @@
 package com.zpj.http.parser.html.nodes;
 
 import com.zpj.http.ZHttp;
+import com.zpj.http.parser.DocumentParser;
 import com.zpj.http.parser.html.Parser;
 
 import java.io.IOException;
@@ -73,7 +74,7 @@ public class Comment extends LeafNode {
      */
     public XmlDeclaration asXmlDeclaration() {
         String data = getData();
-        Document doc = ZHttp.parse("<" + data.substring(1, data.length() -1) + ">", baseUri(), Parser.xmlParser());
+        Document doc = DocumentParser.parse("<" + data.substring(1, data.length() -1) + ">", baseUri(), Parser.xmlParser());
         XmlDeclaration decl = null;
         if (doc.children().size() > 0) {
             Element el = doc.child(0);

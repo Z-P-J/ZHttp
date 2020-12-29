@@ -109,6 +109,11 @@ public class Parser {
         return treeBuilder.parse(new StringReader(html), baseUri, new Parser(treeBuilder));
     }
 
+    public static Document parseXml(String html, String baseUri) {
+        TreeBuilder treeBuilder = new XmlTreeBuilder();
+        return treeBuilder.parse(new StringReader(html), baseUri, new Parser(treeBuilder));
+    }
+
     /**
      * Parse a fragment of HTML into a list of nodes. The context element, if supplied, supplies parsing context.
      *

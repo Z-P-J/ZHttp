@@ -1,6 +1,6 @@
 package com.zpj.http.parser.html.nodes;
 
-import com.zpj.http.utils.ChangeNotifyingArrayList;
+import com.zpj.http.parser.html.utils.ChangeNotifyingArrayList;
 import com.zpj.http.utils.Validate;
 import com.zpj.http.utils.StringUtil;
 import com.zpj.http.parser.html.ParseSettings;
@@ -27,7 +27,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import static com.zpj.http.utils.Normalizer.normalize;
+import static com.zpj.http.parser.html.utils.Normalizer.normalize;
 
 /**
  * A HTML element consists of a tag name, attributes, and child nodes (including text nodes and

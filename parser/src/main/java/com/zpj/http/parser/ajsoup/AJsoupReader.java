@@ -1,7 +1,7 @@
 package com.zpj.http.parser.ajsoup;
 
 
-import com.zpj.http.ZHttp;
+import com.zpj.http.parser.DocumentParser;
 import com.zpj.http.parser.ajsoup.data.ClassDescriptor;
 import com.zpj.http.parser.ajsoup.data.ClassReader;
 import com.zpj.http.parser.ajsoup.data.TypeLiteral;
@@ -37,7 +37,7 @@ public class AJsoupReader {
     public static final <T> T deserialize(String document, Class<T> clazz) {
         AJsoupReader context = jsp.get();
         ClassDescriptor classDescriptor = ClassReader.getClassDescriptor(clazz, true);
-        Document parse = ZHttp.parse(document);
+        Document parse = DocumentParser.parse(document);
         if (classDescriptor.clazz_anno == null)
             throw new RuntimeException(clazz + " you must used  once Annotation ");
        if (isDebug) System.out.println("deserialize: "+classDescriptor.clazz_anno[0].toString() );

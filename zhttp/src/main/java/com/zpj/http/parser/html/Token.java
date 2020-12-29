@@ -3,7 +3,7 @@ package com.zpj.http.parser.html;
 import com.zpj.http.utils.Validate;
 import com.zpj.http.parser.html.nodes.Attributes;
 
-import static com.zpj.http.utils.Normalizer.lowerCase;
+import static com.zpj.http.parser.html.utils.Normalizer.lowerCase;
 
 /**
  * Parse tokens for the Tokeniser.

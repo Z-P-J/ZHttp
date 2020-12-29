@@ -17,15 +17,17 @@ public final class ConstrainableInputStream extends BufferedInputStream {
     private static final int DefaultSize = 1024 * 32;
 
     private final boolean capped;
-    private final int maxSize;
+    private final long maxSize;
     private long startTime;
     private long timeout = 0; // optional max time of request
-    private int remaining;
+    private long remaining;
     private boolean interrupted;
 
-    private ConstrainableInputStream(InputStream in, int bufferSize, int maxSize) {
+    private ConstrainableInputStream(InputStream in, int bufferSize, long maxSize) {
         super(in, bufferSize);
-        Validate.isTrue(maxSize >= 0);
+        if (maxSize < 0) {
+            maxSize = 0;
+        }
         this.maxSize = maxSize;
         remaining = maxSize;
         capped = maxSize != 0;
@@ -39,7 +41,7 @@ public final class ConstrainableInputStream extends BufferedInputStream {
      * @param maxSize the maximum size to allow to be read. 0 == infinite.
      * @return a constrainable input stream
      */
-    public static ConstrainableInputStream wrap(InputStream in, int bufferSize, int maxSize) {
+    public static ConstrainableInputStream wrap(InputStream in, int bufferSize, long maxSize) {
         return in instanceof ConstrainableInputStream
             ? (ConstrainableInputStream) in
             : new ConstrainableInputStream(in, bufferSize, maxSize);
@@ -58,7 +60,7 @@ public final class ConstrainableInputStream extends BufferedInputStream {
             throw new SocketTimeoutException("Read timeout");
 
         if (capped && len > remaining)
-            len = remaining; // don't read more than desired, even if available
+            len = (int) remaining; // don't read more than desired, even if available
 
         try {
             final int read = super.read(b, off, len);
@@ -73,22 +75,22 @@ public final class ConstrainableInputStream extends BufferedInputStream {
      * Reads this inputstream to a ByteBuffer. The supplied max may be less than the inputstream's max, to support
      * reading just the first bytes.
      */
-    public ByteBuffer readToByteBuffer(int max) throws IOException {
+    public ByteBuffer readToByteBuffer(long max) throws IOException {
         Validate.isTrue(max >= 0, "maxSize must be 0 (unlimited) or larger");
         final boolean localCapped = max > 0; // still possibly capped in total stream
-        final int bufferSize = localCapped && max < DefaultSize ? max : DefaultSize;
+        final int bufferSize = (int) (localCapped && max < DefaultSize ? max : DefaultSize);
         final byte[] readBuffer = new byte[bufferSize];
         final ByteArrayOutputStream outStream = new ByteArrayOutputStream(bufferSize);
 
         int read;
-        int remaining = max;
+        long remaining = max;
 
         while (true) {
             read = read(readBuffer);
             if (read == -1) break;
             if (localCapped) { // this local byteBuffer cap may be smaller than the overall maxSize (like when reading first bytes)
                 if (read >= remaining) {
-                    outStream.write(readBuffer, 0, remaining);
+                    outStream.write(readBuffer, 0, (int) remaining);
                     break;
                 }
                 remaining -= read;

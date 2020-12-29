@@ -4,7 +4,7 @@ import com.zpj.http.utils.Validate;
 
 import java.io.InputStream;
 
-public class HttpKeyVal implements Connection.KeyVal {
+public class HttpKeyVal implements IHttp.KeyVal {
 
     private String key;
     private String value;
@@ -61,7 +61,7 @@ public class HttpKeyVal implements Connection.KeyVal {
     }
 
     @Override
-    public Connection.KeyVal contentType(String contentType) {
+    public IHttp.KeyVal contentType(String contentType) {
         Validate.notEmpty(contentType);
         this.contentType = contentType;
         return this;

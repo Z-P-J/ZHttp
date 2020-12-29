@@ -1,6 +1,6 @@
 package com.zpj.http.parser.html.nodes;
 
-import com.zpj.http.exception.SerializationException;
+import com.zpj.http.parser.html.exception.SerializationException;
 import com.zpj.http.utils.StringUtil;
 import com.zpj.http.utils.Validate;
 import com.zpj.http.parser.html.CharacterReader;

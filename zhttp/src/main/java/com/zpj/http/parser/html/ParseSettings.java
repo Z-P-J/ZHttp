@@ -2,7 +2,7 @@ package com.zpj.http.parser.html;
 
 import com.zpj.http.parser.html.nodes.Attributes;
 
-import static com.zpj.http.utils.Normalizer.lowerCase;
+import static com.zpj.http.parser.html.utils.Normalizer.lowerCase;
 
 /**
  * Controls parser settings, to optionally preserve tag and/or attribute name case.

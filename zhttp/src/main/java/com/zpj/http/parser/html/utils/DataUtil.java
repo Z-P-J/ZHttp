@@ -1,4 +1,4 @@
-package com.zpj.http.utils;
+package com.zpj.http.parser.html.utils;
 
 import android.util.Log;
 
@@ -12,6 +12,8 @@ import com.zpj.http.parser.html.nodes.Node;
 import com.zpj.http.parser.html.nodes.XmlDeclaration;
 import com.zpj.http.parser.html.Parser;
 import com.zpj.http.parser.html.select.Elements;
+import com.zpj.http.utils.StringUtil;
+import com.zpj.http.utils.Validate;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -103,14 +105,16 @@ public final class DataUtil {
         final byte[] buffer = new byte[bufferSize];
         int len;
         while ((len = in.read(buffer, 0, buffer.length)) != -1) {
-            if (listener.shouldContinue()) {
+            if (listener == null || listener.shouldContinue()) {
                 Log.d("crossStreams", "len=" + len);
                 out.write(buffer, 0, len);
                 Log.d("crossStreams", "write");
                 out.flush();
                 Log.d("crossStreams", "flush");
                 Log.d("crossStreams", "onBytesWritten");
-                listener.onBytesWritten(len);
+                if (listener != null) {
+                    listener.onBytesWritten(len);
+                }
                 Log.d("crossStreams", "----------------------------------------------");
             } else {
                 Log.d("crossStreams", "stop");
@@ -218,7 +222,7 @@ public final class DataUtil {
      * @return the filled byte buffer
      * @throws IOException if an exception occurs whilst reading from the input stream.
      */
-    public static ByteBuffer readToByteBuffer(InputStream inStream, int maxSize) throws IOException {
+    public static ByteBuffer readToByteBuffer(InputStream inStream, long maxSize) throws IOException {
         Validate.isTrue(maxSize >= 0, "maxSize must be 0 (unlimited) or larger");
         final ConstrainableInputStream input = ConstrainableInputStream.wrap(inStream, bufferSize, maxSize);
         return input.readToByteBuffer(maxSize);
@@ -242,7 +246,7 @@ public final class DataUtil {
             charset = charset.replace("charset=", "");
             return validateCharset(charset);
         }
-        return null;
+        return defaultCharset;
     }
 
     private static String validateCharset(String cs) {

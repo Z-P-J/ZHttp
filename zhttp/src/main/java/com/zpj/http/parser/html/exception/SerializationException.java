@@ -1,4 +1,4 @@
-package com.zpj.http.exception;
+package com.zpj.http.parser.html.exception;
 
 /**
  * A SerializationException is raised whenever serialization of a DOM element fails. This exception usually wraps an

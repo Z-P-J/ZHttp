@@ -1,4 +1,4 @@
-package com.zpj.http.utils;
+package com.zpj.http.parser.html.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;

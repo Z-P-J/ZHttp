@@ -4,7 +4,6 @@ package com.zpj.http.core;
  * @function Http状态码封装
  * @author lemon Guo
  */
-
 public enum HttpStatus {
     CONTINUE(100, "Continue"),
     SWITCHING_PROTOCOLS(101, "Switching Protocols"),

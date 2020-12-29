@@ -32,6 +32,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
@@ -102,6 +103,11 @@ public class SSLContextUtil {
       e.printStackTrace();
     }
     return sslContext;
+  }
+
+  public static void setCaCertificate(Context context, String caAlias, String caPath) {
+    SSLContext sslContext = SSLContextUtil.getSSLContext(context, caAlias, caPath);
+    HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
   }
 
   /**

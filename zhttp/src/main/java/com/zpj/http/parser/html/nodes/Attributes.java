@@ -1,6 +1,6 @@
 package com.zpj.http.parser.html.nodes;
 
-import com.zpj.http.exception.SerializationException;
+import com.zpj.http.parser.html.exception.SerializationException;
 import com.zpj.http.utils.Validate;
 import com.zpj.http.utils.StringUtil;
 import com.zpj.http.parser.html.ParseSettings;
@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.zpj.http.utils.Normalizer.lowerCase;
+import static com.zpj.http.parser.html.utils.Normalizer.lowerCase;
 
 /**
  * The attributes of an Element.
