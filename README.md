@@ -5,7 +5,7 @@
 
     1. 添加依赖
     dependencies {
-        implementation 'com.zpj.http:ZHttp:1.0.1'
+        implementation 'com.zpj.http:ZHttp:1.0.2'
 
         // 如果需要使用RxJava，请添加以下依赖
         implementation 'io.reactivex.rxjava2:rxjava:2.2.17'

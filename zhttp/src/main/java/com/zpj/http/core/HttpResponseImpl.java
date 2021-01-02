@@ -26,25 +26,42 @@ public class HttpResponseImpl extends HttpResponse {
 
     @Override
     protected ResponseInfo onExecute(HttpConfig config) throws Exception {
+        String mimeBoundary = null;
+        if (config.method().hasBody()) {
+            Log.d("HttpResponse", "onExecute config.method.hasBody()=" + config.method.hasBody());
+            if (config.method.hasBody())
+                mimeBoundary = setOutputContentType();
+        }
+
         conn = ConnectionFactory.createConnection(config);
         if (conn.getDoOutput()) {
             conn.setUseCaches(false);
-            String mimeBoundary = null;
-            if (config.method.hasBody())
-                mimeBoundary = setOutputContentType();
             writePost2(conn, mimeBoundary);
         } else {
             conn.connect();
         }
 
+//        conn = ConnectionFactory.createConnection(config);
+//        Log.d("HttpResponse", "onExecute conn.getDoOutput()=" + conn.getDoOutput());
+//        if (conn.getDoOutput()) {
+//            conn.setUseCaches(false);
+//            String mimeBoundary = null;
+//            Log.d("HttpResponse", "onExecute config.method.hasBody()=" + config.method.hasBody());
+//            if (config.method.hasBody())
+//                mimeBoundary = setOutputContentType();
+//            Log.d("HttpResponse", "onExecute mimeBoundary=" + mimeBoundary);
+//            writePost2(conn, mimeBoundary);
+//        } else {
+//            conn.connect();
+//        }
+
         long length;
         try {
             length = Long.parseLong(conn.getHeaderField(HttpHeader.CONTENT_LENGTH));
-        } catch (Exception e) {
-            e.printStackTrace();
-            length = -1;
+        } catch (Exception ignore) {
+            length = conn.getContentLength();
         }
-        Log.d("onExecute", "length=" + length + " ccontent-l=" + conn.getContentLength());
+        Log.d("onExecute", "length=" + length + " content-length=" + conn.getContentLength());
         Map<String, List<String>> map = conn.getHeaderFields();
         for (Map.Entry<String, List<String>> entry : map.entrySet()) {
             Log.d("onExecute", "key=" + entry.getKey() + " value=" + entry.getValue());
@@ -63,64 +80,6 @@ public class HttpResponseImpl extends HttpResponse {
                 });
     }
 
-
-//    @Override
-//    public Document parse(Parser parser) throws IOException {
-//        Validate.isTrue(executed, "Request must be executed (with .execute(), .get(), or .post() before parsing response");
-//
-//        Log.d("HttpResponseImpl", "parse contentType=" + contentType());
-////        if (contentType != null && xmlContentTypeRxp.matcher(contentType).matches()) {
-////            parser = Parser.xmlParser();
-////        } else {
-////            parser = Parser.htmlParser();
-////        }
-//
-//
-//        if (byteData != null) { // bytes have been read in to the buffer, parse that
-//            bodyStream = new ByteArrayInputStream(byteData.array());
-//            inputStreamRead = false; // ok to reparse if in bytes
-//        }
-//        Validate.isFalse(inputStreamRead, "Input stream already read and parsed, cannot re-read.");
-//        Document doc = DataUtil.parseInputStream(bodyStream, charset, config.url.toExternalForm(), parser);
-//        charset = doc.outputSettings().charset().name(); // update charset from meta-equiv, possibly
-//        inputStreamRead = true;
-//        close();
-//        return doc;
-//    }
-//
-//    @Override
-//    public String body() {
-//        prepareByteData();
-//        // charset gets set from header on execute, and from meta-equiv on parse. parse may not have happened yet
-//        String body;
-//        if (charset == null)
-//            body = Charset.forName(DataUtil.defaultCharset).decode(byteData).toString();
-//        else
-//            body = Charset.forName(charset).decode(byteData).toString();
-//        ((Buffer) byteData).rewind(); // cast to avoid covariant return type change in jdk9
-//        return body;
-//    }
-//
-//    @Override
-//    public byte[] bodyAsBytes() {
-//        prepareByteData();
-//        return byteData.array();
-//    }
-//
-//    @Override
-//    public IHttp.Response bufferUp() {
-//        prepareByteData();
-//        return this;
-//    }
-//
-//    @Override
-//    public BufferedInputStream bodyStream() {
-//        Validate.isTrue(executed, "Request must be executed (with .execute(), .get(), or .post() before getting response body");
-//        Validate.isFalse(inputStreamRead, "Request has already been read");
-//        inputStreamRead = true;
-//        return ConstrainableInputStream.wrap(bodyStream, DataUtil.bufferSize, config.maxBodySize);
-//    }
-
     @Override
     public void disconnect() {
         if (conn != null) {
@@ -128,21 +87,6 @@ public class HttpResponseImpl extends HttpResponse {
             conn = null;
         }
     }
-
-//    private void prepareByteData() {
-//        Validate.isTrue(executed, "Request must be executed (with .execute(), .get(), or .post() before getting response body");
-//        if (byteData == null) {
-//            Validate.isFalse(inputStreamRead, "Request has already been read (with .parse())");
-//            try {
-//                byteData = DataUtil.readToByteBuffer(bodyStream, config.maxBodySize);
-//            } catch (IOException e) {
-//                throw new UncheckedIOException(e);
-//            } finally {
-//                inputStreamRead = true;
-//                close();
-//            }
-//        }
-//    }
 
     private Map<String, String> getHeaderMap(HttpURLConnection conn) {
         // the default sun impl of conn.getHeaderFields() returns header values out of order
