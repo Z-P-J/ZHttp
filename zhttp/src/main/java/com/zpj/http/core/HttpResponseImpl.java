@@ -1,5 +1,6 @@
 package com.zpj.http.core;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.zpj.http.parser.html.utils.DataUtil;
@@ -28,7 +29,6 @@ public class HttpResponseImpl extends HttpResponse {
     protected ResponseInfo onExecute(HttpConfig config) throws Exception {
         String mimeBoundary = null;
         if (config.method().hasBody()) {
-            Log.d("HttpResponse", "onExecute config.method.hasBody()=" + config.method.hasBody());
             if (config.method.hasBody())
                 mimeBoundary = setOutputContentType();
         }
@@ -61,16 +61,19 @@ public class HttpResponseImpl extends HttpResponse {
         } catch (Exception ignore) {
             length = conn.getContentLength();
         }
-        Log.d("onExecute", "length=" + length + " content-length=" + conn.getContentLength());
         Map<String, List<String>> map = conn.getHeaderFields();
-        for (Map.Entry<String, List<String>> entry : map.entrySet()) {
-            Log.d("onExecute", "key=" + entry.getKey() + " value=" + entry.getValue());
+
+        if (config.debug) {
+            Log.d("onExecute", "length=" + length + " content-length=" + conn.getContentLength());
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                Log.d("onExecute", "key=" + entry.getKey() + " value=" + entry.getValue());
+            }
         }
         return ResponseInfo.build()
                 .setStatusCode(conn.getResponseCode())
                 .setStatusMessage(conn.getResponseMessage())
                 .setContentType(conn.getContentType())
-                .setContentLength(length) // Long.parseLong(conn.getHeaderField(HttpHeader.CONTENT_LENGTH))
+                .setContentLength(length)
                 .setHeaders(getHeaderMap(conn))
                 .onGetBodyStream(new ResponseInfo.Callback() {
                     @Override
@@ -118,7 +121,7 @@ public class HttpResponseImpl extends HttpResponse {
             String multipartHeader = ("Content-Disposition: form-data; name=\"" + encodeMimeName(keyVal.key()) + "\"");
             if (keyVal.hasInputStream()) {
                 multipartHeader += ("; filename=\"" + encodeMimeName(keyVal.value()) + "\"\r\nContent-Type: ");
-                multipartHeader += (keyVal.contentType() != null ? keyVal.contentType() : DefaultUploadType);
+                multipartHeader += (TextUtils.isEmpty(keyVal.contentType()) ? DefaultUploadType : keyVal.contentType());
                 multipartHeader += "\r\n\r\n";
                 total += multipartHeader.getBytes(charset).length;
                 if (keyVal.inputStream() instanceof FileInputStream) {
@@ -166,7 +169,7 @@ public class HttpResponseImpl extends HttpResponse {
                 if (keyVal.hasInputStream()) {
 
                     multipartHeader += "; filename=\"" + encodeMimeName(keyVal.value()) + "\"\r\nContent-Type: ";
-                    multipartHeader += keyVal.contentType() != null ? keyVal.contentType() : DefaultUploadType;
+                    multipartHeader += (TextUtils.isEmpty(keyVal.contentType()) ? DefaultUploadType : keyVal.contentType());
                     multipartHeader += "\r\n\r\n";
                     w.write(multipartHeader.getBytes(charset));
 

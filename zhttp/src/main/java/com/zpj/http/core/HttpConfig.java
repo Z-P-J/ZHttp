@@ -3,26 +3,20 @@ package com.zpj.http.core;
 import android.text.TextUtils;
 
 import com.zpj.http.ZHttp;
-import com.zpj.http.parser.DocumentParser;
-import com.zpj.http.parser.html.Parser;
 import com.zpj.http.parser.html.nodes.Document;
 import com.zpj.http.utils.UrlUtil;
-import com.zpj.http.utils.Validate;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Map;
-
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
-import io.reactivex.annotations.NonNull;
 
 public class HttpConfig extends BaseConfig<HttpConfig> {
 
@@ -36,6 +30,8 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
     protected HttpConfig() {
         ZHttp.HttpGlobalConfig globalConfig = ZHttp.config();
         this.proxy(globalConfig.proxy())
+                .baseUrl(globalConfig.baseUrl())
+                .debug(globalConfig.debug())
                 .cookies(globalConfig.cookies())
                 .userAgent(globalConfig.userAgent())
                 .connectTimeout(globalConfig.connectTimeout())
@@ -63,22 +59,38 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
 
     public HttpConfig url(String url) {
         try {
+            url = url.trim();
+            String tempUrl = url.toLowerCase();
+            boolean isHttp = tempUrl.startsWith("http://") || tempUrl.startsWith("https://");
+            if (!isHttp) {
+                if (tempUrl.contains("://")) {
+                    throw new MalformedURLException("Only http and https protocols supported!");
+                }
+                if (baseUrl == null) {
+                    throw new MalformedURLException("You must set baseUrl firstly!");
+                }
+                if (!tempUrl.startsWith("/")) {
+                    url = "/" + url;
+                }
+                url = baseUrl.resolve(url).toString();
+            }
             this.url = new URL(UrlUtil.encodeUrl(url));
             if (this.originalUrl == null) {
                 this.originalUrl = this.url;
             }
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Malformed URL: " + url, e);
         }
         return this;
     }
 
     public HttpConfig url(URL url) {
-        this.url = url;
-        if (this.originalUrl == null) {
-            this.originalUrl = this.url;
-        }
-        return this;
+//        this.url = url;
+//        if (this.originalUrl == null) {
+//            this.originalUrl = this.url;
+//        }
+//        return this;
+        return url(url.toString());
     }
 
     public IHttp.Method method() {
@@ -96,12 +108,12 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
     }
 
     public HttpConfig range(long start) {
-        this.headers.put(HttpHeader.RANGE, String.format(Locale.US, "bytes=%d-", start));
+        this.headers.put(HttpHeader.RANGE, String.format(Locale.ENGLISH, "bytes=%d-", start));
         return this;
     }
 
     public HttpConfig range(long start, long end) {
-        this.headers.put(HttpHeader.RANGE, String.format(Locale.US, "bytes=%d-%d", start, end));
+        this.headers.put(HttpHeader.RANGE, String.format(Locale.ENGLISH, "bytes=%d-%d", start, end));
         return this;
     }
 
@@ -115,8 +127,9 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
     }
 
     public HttpConfig data(IHttp.KeyVal keyval) {
-        Validate.notNull(keyval, "Key val must not be null");
-        data.add(keyval);
+        if (keyval != null) {
+            data.add(keyval);
+        }
         return this;
     }
 

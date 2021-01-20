@@ -26,28 +26,36 @@ public class HttpRequestImpl extends HttpRequest {
     @Override
     public Document syncToHtml() throws Exception {
         IHttp.Response response = syncExecute();
-        Validate.isHtml(response.contentType(), config.url.toString());
+        if (!config.ignoreContentType) {
+            Validate.isHtml(response.contentType(), config.url.toString());
+        }
         return Parser.htmlParser().parseInput(response.body(), config.url.toExternalForm());
     }
 
     @Override
     public JSONObject syncToJsonObject() throws Exception {
         IHttp.Response response = syncExecute();
-        Validate.isJson(response.contentType(), config.url.toString());
+        if (!config.ignoreContentType) {
+            Validate.isJson(response.contentType(), config.url.toString());
+        }
         return new JSONObject(response.body());
     }
 
     @Override
     public JSONArray syncToJsonArray() throws Exception {
         IHttp.Response response = syncExecute();
-        Validate.isJson(response.contentType(), config.url.toString());
+        if (!config.ignoreContentType) {
+            Validate.isJson(response.contentType(), config.url.toString());
+        }
         return new JSONArray(response.body());
     }
 
     @Override
     public Document syncToXml() throws Exception {
         IHttp.Response response = syncExecute();
-        Validate.isXml(response.contentType(), config.url.toString());
+        if (!config.ignoreContentType) {
+            Validate.isXml(response.contentType(), config.url.toString());
+        }
         return Parser.xmlParser().parseInput(response.body(), config.url.toExternalForm());
     }
 

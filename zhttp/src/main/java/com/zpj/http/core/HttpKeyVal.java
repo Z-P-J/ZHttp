@@ -1,6 +1,6 @@
 package com.zpj.http.core;
 
-import com.zpj.http.utils.Validate;
+import android.text.TextUtils;
 
 import java.io.InputStream;
 
@@ -13,31 +13,37 @@ public class HttpKeyVal implements IHttp.KeyVal {
     private IHttp.OnStreamWriteListener listener;
 
     public static HttpKeyVal create(String key, String value) {
+        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+            return null;
+        }
         return new HttpKeyVal().key(key).value(value);
     }
 
     public static HttpKeyVal create(String key, String filename, InputStream stream) {
-        return new HttpKeyVal().key(key).value(filename).inputStream(stream);
+        return create(key, filename, stream, null);
     }
 
     public static HttpKeyVal create(String key, String filename, InputStream stream, IHttp.OnStreamWriteListener listener) {
+        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(filename) || stream == null) {
+            return null;
+        }
         return new HttpKeyVal().key(key).value(filename).inputStream(stream).setListener(listener);
     }
 
     private HttpKeyVal() {}
 
+    @Override
     public HttpKeyVal key(String key) {
-        Validate.notEmpty(key, "Data key must not be empty");
         this.key = key;
         return this;
     }
 
+    @Override
     public String key() {
         return key;
     }
 
     public HttpKeyVal value(String value) {
-        Validate.notNull(value, "Data value must not be null");
         this.value = value;
         return this;
     }
@@ -47,7 +53,6 @@ public class HttpKeyVal implements IHttp.KeyVal {
     }
 
     public HttpKeyVal inputStream(InputStream inputStream) {
-        Validate.notNull(value, "Data input stream must not be null");
         this.stream = inputStream;
         return this;
     }
@@ -62,7 +67,6 @@ public class HttpKeyVal implements IHttp.KeyVal {
 
     @Override
     public IHttp.KeyVal contentType(String contentType) {
-        Validate.notEmpty(contentType);
         this.contentType = contentType;
         return this;
     }

@@ -156,8 +156,13 @@ public class MainActivity extends AppCompatActivity {
 //                })
 //                .subscribe();
 
-        ZHttp.get("http://tt.tljpxm.com/app/faxian.jsp?index=faxian")
-                .toXml()
+        ZHttp.config()
+                .baseUrl("http://tt.tljpxm.com")
+                .ignoreContentType(true)
+                .init();
+
+        ZHttp.get("/app/faxian.jsp?index=faxian")
+                .toHtml()
                 .bindToLife(this, Lifecycle.Event.ON_PAUSE)
                 .onSuccess(new IHttp.OnSuccessListener<Document>() {
                     @Override

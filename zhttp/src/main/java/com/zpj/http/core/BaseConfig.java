@@ -5,14 +5,14 @@ import android.text.TextUtils;
 import com.zpj.http.parser.html.TokenQueue;
 import com.zpj.http.parser.html.utils.DataUtil;
 import com.zpj.http.utils.StringUtil;
-import com.zpj.http.utils.Validate;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.IllegalCharsetNameException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.net.ssl.SSLSocketFactory;
@@ -22,7 +22,15 @@ import javax.net.ssl.SSLSocketFactory;
  * */
 public abstract class BaseConfig<T extends BaseConfig<T>> {
 
-    String baseUrl = "";
+    /**
+     * baseUrl
+     */
+    URI baseUrl;
+
+    /**
+     * debug模式
+     */
+    boolean debug;
 
     /**
      * 下载缓冲大小
@@ -84,8 +92,12 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     //-----------------------------------------------------------getter-------------------------------------------------------------
 
 
-    public String baseUrl() {
+    public URI baseUrl() {
         return baseUrl;
+    }
+
+    public boolean debug() {
+        return debug;
     }
 
     public int bufferSize() {
@@ -117,17 +129,14 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     }
 
     public String getCookie(String name) {
-        Validate.notEmpty(name, "Cookie name must not be empty");
         return cookies.get(name);
     }
 
     public boolean hasCookie(String name) {
-        Validate.notEmpty(name, "Cookie name must not be empty");
         return cookies.containsKey(name);
     }
 
     public String removeCookie(String name) {
-        Validate.notEmpty(name, "Cookie name must not be empty");
         return cookies.remove(name);
     }
 
@@ -205,7 +214,31 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
 
     public T baseUrl(String baseUrl) {
+        try {
+            this.baseUrl = new URI(baseUrl);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            this.baseUrl = null;
+        }
+        return (T) this;
+    }
+
+//    public T baseUrl(URL baseUrl) {
+//        try {
+//            this.baseUrl = baseUrl.toURI();
+//        } catch (URISyntaxException e) {
+//            e.printStackTrace();
+//        }
+//        return (T) this;
+//    }
+//
+    public T baseUrl(URI baseUrl) {
         this.baseUrl = baseUrl;
+        return (T) this;
+    }
+
+    public T debug(boolean debug) {
+        this.debug = debug;
         return (T) this;
     }
 
@@ -303,9 +336,9 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     }
 
     public T cookie(String name, String value) {
-        Validate.notEmpty(name, "Cookie name must not be empty");
-        Validate.notNull(value, "Cookie value must not be null");
-        cookies.put(name, value);
+        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
+            cookies.put(name, value);
+        }
         return (T) this;
     }
 

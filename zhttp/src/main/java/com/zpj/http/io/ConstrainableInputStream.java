@@ -1,7 +1,5 @@
 package com.zpj.http.io;
 
-import com.zpj.http.utils.Validate;
-
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -76,7 +74,9 @@ public final class ConstrainableInputStream extends BufferedInputStream {
      * reading just the first bytes.
      */
     public ByteBuffer readToByteBuffer(long max) throws IOException {
-        Validate.isTrue(max >= 0, "maxSize must be 0 (unlimited) or larger");
+        if (max < 0) {
+            max = 0;
+        }
         final boolean localCapped = max > 0; // still possibly capped in total stream
         final int bufferSize = (int) (localCapped && max < DefaultSize ? max : DefaultSize);
         final byte[] readBuffer = new byte[bufferSize];

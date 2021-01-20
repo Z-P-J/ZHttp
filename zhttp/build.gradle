@@ -25,7 +25,7 @@ android {
         artifactId = 'ZHttp'
         userOrg = 'z-p-j'
         groupId = 'com.zpj.http'
-        publishVersion = '1.0.2'
+        publishVersion = '1.0.3'
         desc = 'A Simple Android Network Library.'
         website = 'https://github.com/Z-P-J/ZHttp'
         licences = ['Apache-2.0']
