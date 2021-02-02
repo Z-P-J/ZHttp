@@ -46,7 +46,8 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
                 .ignoreHttpErrors(globalConfig.ignoreHttpErrors())
                 .sslSocketFactory(globalConfig.sslSocketFactory())
                 .maxRedirectCount(globalConfig.maxRedirectCount())
-                .onRedirect(globalConfig.getOnRedirectListener());
+                .onRedirect(globalConfig.getOnRedirectListener())
+                .cookieJar(globalConfig.cookieJar());
     }
 
     public URL url() {
@@ -161,19 +162,6 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
         }
         return this;
     }
-
-//    public HttpRequest3 data(String... keyvals) {
-//        Validate.notNull(keyvals, "Data key value pairs must not be null");
-//        Validate.isTrue(keyvals.length % 2 == 0, "Must supply an even number of key value pairs");
-//        for (int i = 0; i < keyvals.length; i += 2) {
-//            String key = keyvals[i];
-//            String value = keyvals[i + 1];
-//            Validate.notEmpty(key, "Data key must not be empty");
-//            Validate.notNull(value, "Data value must not be null");
-//            data(HttpKeyVal.create(key, value));
-//        }
-//        return this;
-//    }
 
     public HttpConfig data(Collection<IHttp.KeyVal> data) {
         if (data != null) {

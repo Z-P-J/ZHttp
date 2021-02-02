@@ -69,6 +69,7 @@ public class HttpResponseImpl extends HttpResponse {
                 Log.d("onExecute", "key=" + entry.getKey() + " value=" + entry.getValue());
             }
         }
+
         return ResponseInfo.build()
                 .setStatusCode(conn.getResponseCode())
                 .setStatusMessage(conn.getResponseMessage())

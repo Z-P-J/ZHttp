@@ -13,8 +13,11 @@ public class HttpKeyVal implements IHttp.KeyVal {
     private IHttp.OnStreamWriteListener listener;
 
     public static HttpKeyVal create(String key, String value) {
-        if (TextUtils.isEmpty(key) || TextUtils.isEmpty(value)) {
+        if (TextUtils.isEmpty(key)) { //  || TextUtils.isEmpty(value)
             return null;
+        }
+        if (value == null) {
+            value = "";
         }
         return new HttpKeyVal().key(key).value(value);
     }

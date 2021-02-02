@@ -88,6 +88,8 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     IHttp.OnRedirectListener onRedirectListener;
 
+    CookieJar cookieJar;
+
 
     //-----------------------------------------------------------getter-------------------------------------------------------------
 
@@ -208,6 +210,10 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     public IHttp.OnRedirectListener getOnRedirectListener() {
         return onRedirectListener;
+    }
+
+    public CookieJar cookieJar() {
+        return cookieJar;
     }
 
     //-----------------------------------------------------------------setter------------------------------------------------------
@@ -421,4 +427,8 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
         return (T) this;
     }
 
+    public T cookieJar(CookieJar cookieJar) {
+        this.cookieJar = cookieJar;
+        return (T) this;
+    }
 }

@@ -90,6 +90,9 @@ public abstract class HttpResponse implements IHttp.Response {
             if (info.headers.containsKey(HttpHeader.SET_COOKIE)) {
                 config.cookie(info.headers.get(HttpHeader.SET_COOKIE));
             }
+            if (config.cookieJar != null && config.cookies != null) {
+                config.cookieJar.saveCookies(config.url, config.cookies);
+            }
 
             // redirect if there's a location header (from 3xx, or 201 etc)
 //                && req.followRedirects()

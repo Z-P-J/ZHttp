@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.net.ssl.HostnameVerifier;
@@ -60,6 +61,19 @@ public class ConnectionFactory implements IConnectionFactory {
 
         if (config.method().hasBody())
             conn.setDoOutput(true);
+
+        if (config.cookieJar != null) {
+            Map<String, String> cookieMap = config.cookieJar.loadCookies(config.url);
+            if (cookieMap != null) {
+                for (Map.Entry<String, String> entry : cookieMap.entrySet()) {
+                    if (!config.hasCookie(entry.getKey())) {
+                        config.cookie(entry.getKey(), entry.getValue());
+                    }
+                }
+            }
+        }
+
+
         if (config.cookies().size() > 0)
             conn.addRequestProperty(HttpHeader.COOKIE, config.cookieStr());
         String userAgent = config.userAgent;

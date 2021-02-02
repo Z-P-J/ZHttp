@@ -17,6 +17,8 @@ public class DefaultConstant {
 
     public static final int MAX_REDIRECTS = 20;
 
+    public static final CookieJar COOKIE_JAR = new DefaultCookieJar();
+
     // 单位毫秒
     public static final int RETRY_DELAY = 10 * 1000;
 

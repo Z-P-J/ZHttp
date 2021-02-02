@@ -123,7 +123,7 @@ public class HttpObserver<T> {
     }
 
     public final <R> HttpObserver<R> onNext(final OnNextListener<T, R> listener) {
-//        initScheduler();
+        initScheduler();
         Observable<R> o = observable
                 .flatMap(new Function<T, ObservableSource<R>>() {
                     @Override
@@ -141,7 +141,7 @@ public class HttpObserver<T> {
     }
 
     public final <R> HttpObserver<R> flatMap(final OnFlatMapListener<T, R> listener) {
-//        initScheduler();
+        initScheduler();
         Observable<R> o = observable
                 .flatMap(new Function<T, ObservableSource<R>>() {
                     @Override
