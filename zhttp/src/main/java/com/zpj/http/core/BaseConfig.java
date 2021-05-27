@@ -342,7 +342,7 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     }
 
     public T cookie(String name, String value) {
-        if (!TextUtils.isEmpty(name) && !TextUtils.isEmpty(value)) {
+        if (!TextUtils.isEmpty(name)) {
             cookies.put(name, value);
         }
         return (T) this;
@@ -351,12 +351,12 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     public T cookie(String cookie) {
         if (!TextUtils.isEmpty(cookie)) {
             TokenQueue cd = new TokenQueue(cookie);
-            String cookieName = cd.chompTo("=").trim();
-            String cookieVal = cd.consumeTo(";").trim();
-            // ignores path, date, domain, validateTLSCertificates et al. req'd?
-            // name not blank, value not null
-            if (cookieName.length() > 0)
+            while (!cd.isEmpty()) {
+                String cookieName = cd.chompTo("=").trim();
+                String cookieVal = cd.consumeTo(";").trim();
+                cd.chompTo(";");
                 cookie(cookieName, cookieVal);
+            }
         }
         return (T) this;
     }

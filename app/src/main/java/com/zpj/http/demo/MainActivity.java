@@ -14,6 +14,7 @@ import com.zpj.http.ZHttp;
 import com.zpj.http.core.HttpObserver;
 import com.zpj.http.core.IHttp;
 import com.zpj.http.parser.html.nodes.Document;
+import com.zpj.http.parser.html.nodes.Element;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -156,24 +157,87 @@ public class MainActivity extends AppCompatActivity {
 //                })
 //                .subscribe();
 
+//        ZHttp.config()
+//                .baseUrl("http://tt.tljpxm.com")
+//                .ignoreContentType(true)
+//                .init();
+//
+//        ZHttp.get("/app/faxian.jsp?index=faxian")
+//                .toHtml()
+//                .bindToLife(this, Lifecycle.Event.ON_PAUSE)
+//                .onSuccess(new IHttp.OnSuccessListener<Document>() {
+//                    @Override
+//                    public void onSuccess(Document data) throws Exception {
+//                        contentText.setText(data.toString());
+//                    }
+//                })
+//                .onError(new IHttp.OnErrorListener() {
+//                    @Override
+//                    public void onError(Throwable throwable) {
+//                        Toast.makeText(MainActivity.this, "出错了：" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .subscribe();
+
         ZHttp.config()
-                .baseUrl("http://tt.tljpxm.com")
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.81")
                 .ignoreContentType(true)
                 .init();
+//
+//        ZHttp.get("https://account.xiaomi.com/pass/serviceLogin?callback=https%3A%2F%2Fi.mi.com%2Fsts%3Fsign%3DmF32YtfY7XReThOa0pZzXhZXJ0U%253D%26followup%3Dhttps%253A%252F%252Fi.mi.com%252F%26sid%3Di.mi.com&sid=i.mi.com&_locale=zh_CN&_snsNone=true\n")
+//                .toHtml()
+//                .onSuccess(new IHttp.OnSuccessListener<Document>() {
+//                    @Override
+//                    public void onSuccess(Document doc) throws Exception {
+////                        Element element = doc.selectFirst("a.login-btn-2MOTB");
+//                        Log.d(TAG, "element=" + doc.toString());
+////                        String loginUrl = element.attr("href");
+////                        Log.d(TAG, "loginUrl=" + loginUrl);
+//
+//                    }
+//                })
+//                .subscribe();
 
-        ZHttp.get("/app/faxian.jsp?index=faxian")
-                .toHtml()
-                .bindToLife(this, Lifecycle.Event.ON_PAUSE)
-                .onSuccess(new IHttp.OnSuccessListener<Document>() {
+        ZHttp.post("https://account.xiaomi.com/pass/serviceLoginAuth2")
+                .data("needTheme", "false")
+                .data("showActiveX", "false")
+                .data("serviceParam", "{\"checkSafePhone\":false,\"checkSafeAddress\":false,\"lsrp_score\":0.0}")
+                .data("callback", "https://i.mi.com/sts?sign=mF32YtfY7XReThOa0pZzXhZXJ0U%3D&followup=https%3A%2F%2Fi.mi.com%2F&sid=i.mi.com")
+                .data("qs", "%3Fcallback%3Dhttps%253A%252F%252Fi.mi.com%252Fsts%253Fsign%253DmF32YtfY7XReThOa0pZzXhZXJ0U%25253D%2526followup%253Dhttps%25253A%25252F%25252Fi.mi.com%25252F%2526sid%253Di.mi.com%26sid%3Di.mi.com%26_locale%3Dzh_CN%26_snsNone%3Dtrue")
+                .data("sid", "i.mi.com")
+                .data("_sign", "9jXUgB/pG9gyrojgrYozJpnskkE=")
+                .data("user", "15086601665")
+                .data("cc", "+86")
+                .data("hash", "3E3B13DB9E139005D57AF059BF9FAF8F")
+                .data("_json", "true")
+                .execute()
+                .onSuccess(new IHttp.OnSuccessListener<IHttp.Response>() {
                     @Override
-                    public void onSuccess(Document data) throws Exception {
-                        contentText.setText(data.toString());
+                    public void onSuccess(IHttp.Response res) throws Exception {
+                        Log.d("MainActivity", "cookies=" + res.cookieStr());
+                        Log.d("MainActivity", "body=" + res.body());
+//                        ZHttp.get("https://i.mi.com/sts?sign=mF32YtfY7XReThOa0pZzXhZXJ0U%3D&followup=https%3A%2F%2Fi.mi.com%2F&sid=i.mi.com")
+//                                .cookie(res.cookieStr())
+//                                .toStr()
+//                                .onSuccess(new IHttp.OnSuccessListener<String>() {
+//                                    @Override
+//                                    public void onSuccess(String body) throws Exception {
+//                                        Log.d("MainActivity", "https://i.mi.com/#/ body=" + body);
+//                                    }
+//                                })
+//                                .onError(new IHttp.OnErrorListener() {
+//                                    @Override
+//                                    public void onError(Throwable throwable) {
+//                                        throwable.printStackTrace();
+//                                    }
+//                                })
+//                                .subscribe();
                     }
                 })
                 .onError(new IHttp.OnErrorListener() {
                     @Override
                     public void onError(Throwable throwable) {
-                        Toast.makeText(MainActivity.this, "出错了：" + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                        throwable.printStackTrace();
                     }
                 })
                 .subscribe();
