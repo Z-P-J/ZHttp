@@ -30,7 +30,7 @@ public abstract class HttpResponse implements IHttp.Response {
     public static final int HTTP_TEMP_REDIR = 307; // http/1.1 temporary redirect, not in Java's set.
     public static final String DefaultUploadType = "application/octet-stream";
 
-    protected final HttpRequest req;
+    protected final IHttp.Request req;
     protected final HttpConfig config;
 
     private ByteBuffer byteData;
@@ -45,13 +45,13 @@ public abstract class HttpResponse implements IHttp.Response {
     private ResponseInfo info;
 
 
-    protected HttpResponse(HttpRequest req) {
+    protected HttpResponse(IHttp.Request req) {
         this.req = req;
-        this.config = req.getConfig();
+        this.config = req.config();
     }
 
     @Override
-    public HttpConfig getConfig() {
+    public HttpConfig config() {
         return config;
     }
 
@@ -83,7 +83,6 @@ public abstract class HttpResponse implements IHttp.Response {
         long startTime = System.nanoTime();
 
         try {
-
             info = onExecute(config);
             Log.d("HttpResponse", "execute info=" + info);
 
@@ -152,43 +151,6 @@ public abstract class HttpResponse implements IHttp.Response {
         executed = true;
         return this;
     }
-
-//    @Override
-//    public Document parse(Parser parser) throws IOException {
-//        Validate.isTrue(executed, "Request must be executed (with .execute(), .get(), or .post() before parsing response");
-//
-//        Log.d("HttpResponseImpl", "parse contentType=" + contentType());
-//        if (parser.getTreeBuilder() instanceof XmlTreeBuilder) {
-////            if (!xmlContentTypeRxp.matcher(contentType()).matches()) {
-////                throw new UnsupportedMimeTypeException("Unhandled content type. Must be xml content type", contentType(), config.url().toString());
-////            }
-//            Validate.isXml(contentType(), config.url.toString());
-//        } else if (parser.getTreeBuilder() instanceof HtmlTreeBuilder) {
-////            if (!htmlContentTypeRxp.matcher(contentType()).matches()) {
-////                throw new UnsupportedMimeTypeException("Unhandled content type. Must be html content type", contentType(), config.url().toString());
-////            }
-//            Validate.isHtml(contentType(), config.url.toString());
-//        } else {
-//            throw new IllegalArgumentException("unsupported parser.");
-//        }
-////        if (xmlContentTypeRxp.matcher(contentType()).matches()) {
-////            parser = Parser.xmlParser();
-////        } else {
-////            parser = Parser.htmlParser();
-////        }
-//
-//
-//        if (byteData != null) { // bytes have been read in to the buffer, parse that
-//            bodyStream = new ByteArrayInputStream(byteData.array());
-//            inputStreamRead = false; // ok to reparse if in bytes
-//        }
-//        Validate.isFalse(inputStreamRead, "Input stream already read and parsed, cannot re-read.");
-//        Document doc = DataUtil.parseInputStream(bodyStream, charset, config.url.toExternalForm(), parser);
-//        charset = doc.outputSettings().charset().name(); // update charset from meta-equiv, possibly
-//        inputStreamRead = true;
-//        close();
-//        return doc;
-//    }
 
     @Override
     public String body() {

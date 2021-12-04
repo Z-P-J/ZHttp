@@ -20,17 +20,15 @@ public class HttpResponseImpl extends HttpResponse {
 
     private HttpURLConnection conn;
 
-    protected HttpResponseImpl(HttpRequest req) {
+    protected HttpResponseImpl(IHttp.Request req) {
         super(req);
-
     }
 
     @Override
     protected ResponseInfo onExecute(HttpConfig config) throws Exception {
         String mimeBoundary = null;
         if (config.method().hasBody()) {
-            if (config.method.hasBody())
-                mimeBoundary = setOutputContentType();
+            mimeBoundary = setOutputContentType();
         }
 
         conn = ConnectionFactory.createConnection(config);
@@ -40,20 +38,6 @@ public class HttpResponseImpl extends HttpResponse {
         } else {
             conn.connect();
         }
-
-//        conn = ConnectionFactory.createConnection(config);
-//        Log.d("HttpResponse", "onExecute conn.getDoOutput()=" + conn.getDoOutput());
-//        if (conn.getDoOutput()) {
-//            conn.setUseCaches(false);
-//            String mimeBoundary = null;
-//            Log.d("HttpResponse", "onExecute config.method.hasBody()=" + config.method.hasBody());
-//            if (config.method.hasBody())
-//                mimeBoundary = setOutputContentType();
-//            Log.d("HttpResponse", "onExecute mimeBoundary=" + mimeBoundary);
-//            writePost2(conn, mimeBoundary);
-//        } else {
-//            conn.connect();
-//        }
 
         long length;
         try {
@@ -78,7 +62,7 @@ public class HttpResponseImpl extends HttpResponse {
                 .setHeaders(getHeaderMap(conn))
                 .onGetBodyStream(new ResponseInfo.Callback() {
                     @Override
-                    public InputStream get() throws Exception {
+                    public InputStream getBodyStream() throws Exception {
                         return conn.getErrorStream() != null ? conn.getErrorStream() : conn.getInputStream();
                     }
                 });
@@ -109,8 +93,6 @@ public class HttpResponseImpl extends HttpResponse {
         }
         return headers;
     }
-
-
 
     private long getTotalBytes(final String bound) throws IOException {
         String charset = config.postDataCharset();

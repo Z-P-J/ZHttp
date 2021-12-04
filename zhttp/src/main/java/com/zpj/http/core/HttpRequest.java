@@ -20,13 +20,14 @@ public abstract class HttpRequest implements IHttp.Request {
         this.config = config;
     }
 
-    public HttpConfig getConfig() {
+    @Override
+    public HttpConfig config() {
         return config;
     }
 
     @Override
     public IHttp.Response response() throws Exception {
-        return new HttpResponseImpl(this);
+        return config.httpFactory().createResponse(this);
     }
 
     @Override

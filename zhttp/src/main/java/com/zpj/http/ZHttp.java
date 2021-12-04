@@ -2,7 +2,6 @@ package com.zpj.http;
 
 import com.zpj.http.core.BaseConfig;
 import com.zpj.http.core.ConnectionFactory;
-import com.zpj.http.core.CookieJar;
 import com.zpj.http.core.DefaultCookieJar;
 import com.zpj.http.core.HttpConfig;
 import com.zpj.http.core.IHttp;
@@ -61,7 +60,6 @@ public class ZHttp {
         return connect(url).method(IHttp.Method.TRACE);
     }
 
-
     public static class HttpGlobalConfig extends BaseConfig<HttpGlobalConfig> {
 
         private HttpGlobalConfig() {
@@ -74,7 +72,7 @@ public class ZHttp {
             }
         }
 
-//        @Override
+        //        @Override
 //        public CookieJar cookieJar() {
 //            CookieJar cookieJar = super.cookieJar();
 //            if (cookieJar == null) {

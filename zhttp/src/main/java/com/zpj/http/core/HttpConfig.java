@@ -47,14 +47,15 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
                 .sslSocketFactory(globalConfig.sslSocketFactory())
                 .maxRedirectCount(globalConfig.maxRedirectCount())
                 .onRedirect(globalConfig.getOnRedirectListener())
-                .cookieJar(globalConfig.cookieJar());
+                .cookieJar(globalConfig.cookieJar())
+                .httpFactory(globalConfig.httpFactory());
     }
 
     public URL url() {
         return url;
     }
 
-    public URL getOriginalUrl() {
+    public URL originalUrl() {
         return originalUrl;
     }
 
@@ -192,7 +193,8 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
     }
 
     public IHttp.Request request() {
-        return new HttpRequestImpl(this);
+        return httpFactory().createRequest(this);
+//        return new HttpRequestImpl(this);
     }
 
     public IHttp.Response syncExecute() throws Exception {

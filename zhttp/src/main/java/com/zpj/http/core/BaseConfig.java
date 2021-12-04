@@ -2,6 +2,7 @@ package com.zpj.http.core;
 
 import android.text.TextUtils;
 
+import com.zpj.http.ZHttp;
 import com.zpj.http.parser.html.TokenQueue;
 import com.zpj.http.parser.html.utils.DataUtil;
 import com.zpj.http.utils.StringUtil;
@@ -39,7 +40,7 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     long maxBodySize = DefaultConstant.MAX_BODY_SIZE;
 
-    boolean ignoreHttpErrors = true;
+    boolean ignoreHttpErrors = false;
 
     boolean ignoreContentType = false;
 
@@ -76,7 +77,7 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
      * */
     final Map<String, String> cookies = new HashMap<>();
 
-    boolean allowAllSSL = true;
+    boolean allowAllSSL = false;
 
     final Map<String, String> headers = new HashMap<>();
 
@@ -89,6 +90,8 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     IHttp.OnRedirectListener onRedirectListener;
 
     CookieJar cookieJar;
+
+    IHttp.HttpFactory mHttpFactory;
 
 
     //-----------------------------------------------------------getter-------------------------------------------------------------
@@ -214,6 +217,13 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     public CookieJar cookieJar() {
         return cookieJar;
+    }
+
+    public IHttp.HttpFactory httpFactory() {
+        if (mHttpFactory == null) {
+            mHttpFactory = new HttpURLFactory();
+        }
+        return mHttpFactory;
     }
 
     //-----------------------------------------------------------------setter------------------------------------------------------
@@ -431,4 +441,10 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
         this.cookieJar = cookieJar;
         return (T) this;
     }
+
+    public T httpFactory(IHttp.HttpFactory mHttpFactory) {
+        this.mHttpFactory = mHttpFactory;
+        return (T) this;
+    }
+
 }

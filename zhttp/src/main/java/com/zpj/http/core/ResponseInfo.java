@@ -1,7 +1,6 @@
 package com.zpj.http.core;
 
 import java.io.InputStream;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ResponseInfo {
@@ -14,7 +13,9 @@ public class ResponseInfo {
     private Callback callback;
 
     public interface Callback {
-        InputStream get() throws Exception;
+        InputStream getBodyStream() throws Exception;
+
+//        void disconnect();
     }
 
     private ResponseInfo() {
@@ -32,7 +33,7 @@ public class ResponseInfo {
 
     public InputStream getBodyStream() throws Exception {
         if (callback != null) {
-            return callback.get();
+            return callback.getBodyStream();
         }
         return null;
     }

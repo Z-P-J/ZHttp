@@ -41,6 +41,22 @@ public interface IHttp {
         }
     }
 
+    public interface HttpEngine {
+
+        ResponseInfo execute(Request request) throws Exception;
+
+    }
+
+    public interface HttpFactory {
+
+        Request createRequest(HttpConfig config);
+
+        Response createResponse(Request request);
+
+//        HttpEngine createHttpEngine();
+
+    }
+
     interface OnRedirectListener {
         boolean onRedirect(int redirectCount, String redirectUrl);
     }
@@ -77,6 +93,8 @@ public interface IHttp {
      */
     interface Request {
 
+        HttpConfig config();
+
         Response response() throws Exception;
 
         Response syncExecute() throws Exception;
@@ -112,7 +130,7 @@ public interface IHttp {
      */
     interface Response {
 
-        HttpConfig getConfig();
+        HttpConfig config();
 
         Response execute() throws Exception;
 
