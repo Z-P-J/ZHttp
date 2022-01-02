@@ -2,17 +2,15 @@ package com.zpj.http.core;
 
 import android.text.TextUtils;
 
-import com.zpj.http.ZHttp;
-import com.zpj.http.parser.html.TokenQueue;
-import com.zpj.http.parser.html.utils.DataUtil;
+import com.zpj.http.constant.Defaults;
+import com.zpj.http.utils.DataUtil;
 import com.zpj.http.utils.StringUtil;
+import com.zpj.http.utils.TokenQueue;
 
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,9 +34,9 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     /**
      * 下载缓冲大小
      * */
-    int bufferSize = DefaultConstant.BUFFER_SIZE;
+    int bufferSize = Defaults.BUFFER_SIZE;
 
-    long maxBodySize = DefaultConstant.MAX_BODY_SIZE;
+    long maxBodySize = Defaults.MAX_BODY_SIZE;
 
     boolean ignoreHttpErrors = false;
 
@@ -47,30 +45,26 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     String postDataCharset = DataUtil.defaultCharset;
 
 
-    /**
-     * 默认UserAgent
-     * */
-    String userAgent = DefaultConstant.USER_AGENT;
 
     /**
      * 出错重试次数
      * */
-    int retryCount = DefaultConstant.RETRY_COUNT;
+    int retryCount = Defaults.RETRY_COUNT;
 
     /**
      * 出错重试延迟时间（单位ms）
      * */
-    int retryDelay = DefaultConstant.RETRY_DELAY;
+    int retryDelay = Defaults.RETRY_DELAY;
 
     /**
      * 连接超时
      * */
-    int connectTimeout = DefaultConstant.CONNECT_OUT_TIME;
+    int connectTimeout = Defaults.CONNECT_OUT_TIME;
 
     /**
      * 读取超时
      * */
-    int readTimeout = DefaultConstant.READ_OUT_TIME;
+    int readTimeout = Defaults.READ_OUT_TIME;
 
     /**
      * 默认cookie值
@@ -85,13 +79,13 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     private SSLSocketFactory sslSocketFactory;
 
-    int maxRedirectCount = DefaultConstant.MAX_REDIRECTS;
+    int maxRedirectCount = Defaults.MAX_REDIRECTS;
 
     IHttp.OnRedirectListener onRedirectListener;
 
-    CookieJar cookieJar;
-
-    IHttp.HttpFactory mHttpFactory;
+    protected BaseConfig() {
+        headers.put(HttpHeader.USER_AGENT, Defaults.USER_AGENT);
+    }
 
 
     //-----------------------------------------------------------getter-------------------------------------------------------------
@@ -126,7 +120,7 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     }
 
     public String userAgent() {
-        return userAgent;
+        return headers.get(HttpHeader.USER_AGENT);
     }
 
     public int retryCount() {
@@ -215,17 +209,6 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
         return onRedirectListener;
     }
 
-    public CookieJar cookieJar() {
-        return cookieJar;
-    }
-
-    public IHttp.HttpFactory httpFactory() {
-        if (mHttpFactory == null) {
-            mHttpFactory = new HttpURLFactory();
-        }
-        return mHttpFactory;
-    }
-
     //-----------------------------------------------------------------setter------------------------------------------------------
 
 
@@ -255,6 +238,13 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     public T debug(boolean debug) {
         this.debug = debug;
+        return (T) this;
+    }
+
+    public T userAgent(String userAgent) {
+        if (!TextUtils.isEmpty(userAgent)) {
+            headers.put(HttpHeader.USER_AGENT, userAgent);
+        }
         return (T) this;
     }
 
@@ -324,10 +314,8 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
         return (T) this;
     }
 
-    public T postDataCharset(String charset) {
-        if (!TextUtils.isEmpty(charset) && Charset.isSupported(charset)) {
-            this.postDataCharset = charset;
-        }
+    public T postDataCharset(String postDataCharset) {
+        this.postDataCharset = postDataCharset;
         return (T) this;
     }
 
@@ -338,11 +326,6 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     public T ignoreContentType(boolean ignoreContentType) {
         this.ignoreContentType = ignoreContentType;
-        return (T) this;
-    }
-
-    public T userAgent(String userAgent) {
-        this.userAgent = userAgent;
         return (T) this;
     }
 
@@ -372,9 +355,8 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     }
 
     public T cookies(Map<String, String> cookies) {
-        this.cookies.clear();
-        for (Map.Entry<String, String> entry : cookies.entrySet()) {
-            this.cookies.put(entry.getKey(), entry.getValue());
+        if (cookies != null) {
+            this.cookies.putAll(cookies);
         }
         return (T) this;
     }
@@ -434,16 +416,6 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     public T onRedirect(IHttp.OnRedirectListener onRedirectListener) {
         this.onRedirectListener = onRedirectListener;
-        return (T) this;
-    }
-
-    public T cookieJar(CookieJar cookieJar) {
-        this.cookieJar = cookieJar;
-        return (T) this;
-    }
-
-    public T httpFactory(IHttp.HttpFactory mHttpFactory) {
-        this.mHttpFactory = mHttpFactory;
         return (T) this;
     }
 

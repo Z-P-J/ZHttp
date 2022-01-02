@@ -1,37 +1,11 @@
 package com.zpj.http.utils;
 
-import com.zpj.http.exception.UnsupportedMimeTypeException;
-
-import java.util.regex.Pattern;
-
 /**
  * Simple validation methods. Designed for jsoup internal use
  */
 public final class Validate {
 
-    private static final Pattern xmlContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?xml.*");
-    private static final Pattern htmlContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?html.*");
-    private static final Pattern jsonContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?json.*");
-    
     private Validate() {}
-
-    public static void isXml(String contentType, String url) throws UnsupportedMimeTypeException {
-        if (!xmlContentTypeRxp.matcher(contentType).matches()) {
-            throw new UnsupportedMimeTypeException("Unhandled content type. Must be xml content type", contentType, url);
-        }
-    }
-
-    public static void isHtml(String contentType, String url) throws UnsupportedMimeTypeException {
-        if (!htmlContentTypeRxp.matcher(contentType).matches()) {
-            throw new UnsupportedMimeTypeException("Unhandled content type. Must be html content type", contentType, url);
-        }
-    }
-
-    public static void isJson(String contentType, String url) throws UnsupportedMimeTypeException {
-        if (!jsonContentTypeRxp.matcher(contentType).matches()) {
-            throw new UnsupportedMimeTypeException("Unhandled content type. Must be json content type", contentType, url);
-        }
-    }
 
     /**
      * Validates that the object is not null

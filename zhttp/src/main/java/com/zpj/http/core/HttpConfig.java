@@ -2,16 +2,15 @@ package com.zpj.http.core;
 
 import android.text.TextUtils;
 
-import com.zpj.http.ZHttp;
-import com.zpj.http.parser.html.nodes.Document;
+import com.zpj.http.impl.HttpCookieJarImpl;
+import com.zpj.http.impl.HttpDispatcherImpl;
+import com.zpj.http.impl.HttpFactoryImpl;
 import com.zpj.http.utils.UrlUtil;
+import com.zpj.http.utils.Validate;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -27,35 +26,46 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
     protected IHttp.Method method = IHttp.Method.GET;
     protected String body = null;
 
-    protected HttpConfig() {
-        ZHttp.HttpGlobalConfig globalConfig = ZHttp.config();
-        this.proxy(globalConfig.proxy())
-                .baseUrl(globalConfig.baseUrl())
-                .debug(globalConfig.debug())
-                .cookies(globalConfig.cookies())
-                .userAgent(globalConfig.userAgent())
-                .connectTimeout(globalConfig.connectTimeout())
-                .readTimeout(globalConfig.readTimeout())
-                .retryCount(globalConfig.retryCount())
-                .retryDelay(globalConfig.retryDelay())
-                .bufferSize(globalConfig.bufferSize())
-                .maxBodySize(globalConfig.maxBodySize())
-                .allowAllSSL(globalConfig.allowAllSSL())
-                .headers(globalConfig.headers())
-                .ignoreContentType(globalConfig.ignoreContentType())
-                .ignoreHttpErrors(globalConfig.ignoreHttpErrors())
-                .sslSocketFactory(globalConfig.sslSocketFactory())
-                .maxRedirectCount(globalConfig.maxRedirectCount())
-                .onRedirect(globalConfig.getOnRedirectListener())
-                .cookieJar(globalConfig.cookieJar())
-                .httpFactory(globalConfig.httpFactory());
+    private IHttp.CookieJar cookieJar;
+
+    private IHttp.HttpFactory httpFactory;
+
+    private IHttp.HttpDispatcher httpDispatcher;
+
+    public HttpConfig cookieJar(IHttp.CookieJar cookieJar) {
+        this.cookieJar = cookieJar;
+        return this;
+    }
+
+    public HttpConfig httpFactory(IHttp.HttpFactory httpFactory) {
+        this.httpFactory = httpFactory;
+        return this;
+    }
+
+    public HttpConfig httpDispatcher(IHttp.HttpDispatcher httpDispatcher) {
+        this.httpDispatcher = httpDispatcher;
+        return this;
+    }
+
+    public IHttp.CookieJar cookieJar() {
+        return cookieJar;
+    }
+
+    public IHttp.HttpFactory httpFactory() {
+        Validate.notNull(httpFactory, "HttpFactory must not be null");
+        return httpFactory;
+    }
+
+    public IHttp.HttpDispatcher httpDispatcher() {
+        Validate.notNull(httpFactory, "HttpDispatcher must not be null");
+        return httpDispatcher;
     }
 
     public URL url() {
         return url;
     }
 
-    public URL originalUrl() {
+    public URL getOriginalUrl() {
         return originalUrl;
     }
 
@@ -194,56 +204,31 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
 
     public IHttp.Request request() {
         return httpFactory().createRequest(this);
-//        return new HttpRequestImpl(this);
     }
 
-    public IHttp.Response syncExecute() throws Exception {
-        return request().syncExecute();
+    public IHttp.Connection connection() {
+        return httpFactory().createConnection(request());
     }
 
-    public String syncToStr() throws Exception {
-        return request().syncToStr();
+    public IHttp.Response execute() throws IOException {
+        return connection().execute();
     }
 
-    public Document syncToHtml() throws Exception {
-        return request().syncToHtml();
+    public void enqueue(IHttp.Callback callback) {
+        connection().enqueue(callback);
     }
 
-    public JSONObject syncToJsonObject() throws Exception {
-        return request().syncToJsonObject();
+    public String parseToStr() throws IOException {
+        return execute().bodyString();
     }
 
-    public JSONArray syncToJsonArray() throws Exception {
-        return request().syncToJsonArray();
+    public <T> T parse(IHttp.Parser<T> parser) throws IOException {
+        return execute().parse(parser);
     }
 
-    public Document syncToXml() throws Exception {
-        return request().syncToXml();
-    }
-
-
-    public final HttpObserver<IHttp.Response> execute() {
-        return request().execute();
-    }
-
-    public final HttpObserver<String> toStr() {
-        return request().toStr();
-    }
-
-    public final HttpObserver<Document> toHtml() {
-        return request().toHtml();
-    }
-
-    public final HttpObserver<JSONObject> toJsonObject() {
-        return request().toJsonObject();
-    }
-
-    public final HttpObserver<JSONArray> toJsonArray() {
-        return request().toJsonArray();
-    }
-
-    public final HttpObserver<Document> toXml() {
-        return request().toXml();
+    public <T> T parse(Class<T> clazz) throws IOException {
+        // TODO
+        return null;
     }
 
 }

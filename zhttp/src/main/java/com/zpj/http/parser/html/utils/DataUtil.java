@@ -3,8 +3,8 @@ package com.zpj.http.parser.html.utils;
 import android.util.Log;
 
 import com.zpj.http.core.IHttp;
-import com.zpj.http.exception.UncheckedIOException;
 import com.zpj.http.io.ConstrainableInputStream;
+import com.zpj.http.parser.html.exception.UncheckedIOException;
 import com.zpj.http.parser.html.nodes.Comment;
 import com.zpj.http.parser.html.nodes.Document;
 import com.zpj.http.parser.html.nodes.Element;

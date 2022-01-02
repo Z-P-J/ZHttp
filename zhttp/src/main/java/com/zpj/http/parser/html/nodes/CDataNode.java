@@ -1,6 +1,6 @@
 package com.zpj.http.parser.html.nodes;
 
-import com.zpj.http.exception.UncheckedIOException;
+import com.zpj.http.parser.html.exception.UncheckedIOException;
 
 import java.io.IOException;
 

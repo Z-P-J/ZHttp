@@ -1,31 +1,51 @@
 package com.zpj.http;
 
 import com.zpj.http.core.BaseConfig;
-import com.zpj.http.core.ConnectionFactory;
-import com.zpj.http.core.DefaultCookieJar;
 import com.zpj.http.core.HttpConfig;
 import com.zpj.http.core.IHttp;
-import com.zpj.http.ssl.HTTPSTrustManager;
+import com.zpj.http.impl.ParserFactoryImpl;
+import com.zpj.http.utils.Validate;
 
-public class ZHttp {
+public final class ZHttp {
 
-    private static HttpGlobalConfig HTTP_CONFIG;
+    private static final class Holder {
+        private static final HttpGlobalConfig HTTP_CONFIG = new HttpGlobalConfig();
+    }
 
     private ZHttp() {}
 
     public static HttpGlobalConfig config() {
-        if (HTTP_CONFIG == null) {
-            synchronized (HttpGlobalConfig.class) {
-                if (HTTP_CONFIG == null) {
-                    HTTP_CONFIG = new HttpGlobalConfig();
-                }
-            }
-        }
-        return HTTP_CONFIG;
+        return Holder.HTTP_CONFIG;
+    }
+
+    private static HttpConfig newConfig() {
+        return new HttpConfig()
+                .baseUrl(config().baseUrl())
+                .debug(config().debug())
+                .headers(config().headers())
+                .bufferSize(config().bufferSize())
+                .maxBodySize(config().maxBodySize())
+                .maxRedirectCount(config().maxRedirectCount())
+                .ignoreHttpErrors(config().ignoreHttpErrors())
+                .ignoreContentType(config().ignoreContentType())
+                .postDataCharset(config().postDataCharset())
+                .retryCount(config().retryCount())
+                .cookies(config().cookies())
+                .retryDelay(config().retryDelay())
+                .connectTimeout(config().connectTimeout())
+                .readTimeout(config().readTimeout())
+                .allowAllSSL(config().allowAllSSL())
+                .sslSocketFactory(config().sslSocketFactory())
+                .proxy(config().proxy())
+                .maxRedirectCount(config().maxRedirectCount())
+                .onRedirect(config().getOnRedirectListener())
+                .cookieJar(config().httpEngine().getCookieJar())
+                .httpFactory(config().httpEngine().getHttpFactory())
+                .httpDispatcher(config().httpEngine().getHttpDispatcher());
     }
 
     public static HttpConfig connect(String url) {
-        return ConnectionFactory.createHttpRequest(url);
+        return newConfig().url(url);
     }
 
     public static HttpConfig get(String url) {
@@ -60,28 +80,40 @@ public class ZHttp {
         return connect(url).method(IHttp.Method.TRACE);
     }
 
+
     public static class HttpGlobalConfig extends BaseConfig<HttpGlobalConfig> {
 
+        private IHttp.HttpEngine httpEngine;
+        private IHttp.ParserFactory parserFactory = new ParserFactoryImpl();
+
         private HttpGlobalConfig() {
-            cookieJar(new DefaultCookieJar());
+
+        }
+
+        public IHttp.HttpEngine httpEngine() {
+            Validate.notNull(httpEngine, "HttpEngine must not be null");
+            return httpEngine;
+        }
+
+        public HttpGlobalConfig httpEngine(IHttp.HttpEngine httpEngine) {
+            this.httpEngine = httpEngine;
+            return this;
+        }
+
+        public HttpGlobalConfig parserFactory(IHttp.ParserFactory parserFactory) {
+            this.parserFactory = parserFactory;
+            return this;
+        }
+
+        public IHttp.ParserFactory parserFactory() {
+            return parserFactory;
         }
 
         public void init() {
-            if (allowAllSSL()) {
-                HTTPSTrustManager.allowAllSSL();
-            }
+            httpEngine().initSSL(allowAllSSL());
         }
 
-        //        @Override
-//        public CookieJar cookieJar() {
-//            CookieJar cookieJar = super.cookieJar();
-//            if (cookieJar == null) {
-//                cookieJar = new DefaultCookieJar();
-//                cookieJar(cookieJar);
-//            }
-//            return cookieJar;
-//        }
     }
 
-    
+
 }

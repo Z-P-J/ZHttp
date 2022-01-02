@@ -1,22 +1,28 @@
-package com.zpj.http.core;
+package com.zpj.http.impl;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.zpj.http.core.IHttp;
+
 import java.net.URL;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DefaultCookieJar implements CookieJar {
+/**
+ * @author Z-P-J
+ */
+public class HttpCookieJarImpl implements IHttp.CookieJar {
 
     private static final String TAG = "DefaultCookieJar";
 
     private final Map<String, Map<String, String>> cookiesMap = new HashMap<>();
 
-    @Nullable
     @Override
-    public Map<String, String> loadCookies(@NonNull URL url) {
+    public Map<String, String> loadCookies(URL url) {
+        if (url == null) {
+            return Collections.emptyMap();
+        }
         synchronized (cookiesMap) {
             String host = url.getHost();
             Log.d(TAG, "loadCookies host=" + host + " url=" + url.toString());
@@ -34,7 +40,10 @@ public class DefaultCookieJar implements CookieJar {
     }
 
     @Override
-    public void saveCookies(@NonNull URL url, @NonNull Map<String, String> cookieMap) {
+    public void saveCookies(URL url, Map<String, String> cookieMap) {
+        if (url == null || cookieMap == null) {
+            return;
+        }
         synchronized (cookiesMap) {
             String host = url.getHost();
             Log.d(TAG, "saveCookies host=" + host + " url=" + url.toString());

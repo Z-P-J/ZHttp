@@ -1,4 +1,4 @@
-package com.zpj.http.exception;
+package com.zpj.http.parser.html.exception;
 
 import java.io.IOException;
 

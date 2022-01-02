@@ -1,20 +1,36 @@
 package com.zpj.http.core;
 
-import com.zpj.http.exception.UncheckedIOException;
-import com.zpj.http.parser.html.Parser;
-import com.zpj.http.parser.html.nodes.Document;
-
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.Map;
 
-import io.reactivex.disposables.Disposable;
-
 public interface IHttp {
+
+    interface HttpEngine {
+
+        HttpFactory getHttpFactory();
+
+        HttpDispatcher getHttpDispatcher();
+
+        CookieJar getCookieJar();
+
+        void initSSL(boolean isAllowAllSSL);
+
+    }
+
+    interface Parser<T> {
+        T parse(Response response) throws IOException;
+    }
+
+    interface ParserFactory {
+
+        <T> void register(Type type, Parser<T> parser);
+
+        <T> Parser<T> create(Type type);
+
+    }
 
     /**
      * GET and POST http methods.
@@ -41,40 +57,8 @@ public interface IHttp {
         }
     }
 
-    public interface HttpEngine {
-
-        ResponseInfo execute(Request request) throws Exception;
-
-    }
-
-    public interface HttpFactory {
-
-        Request createRequest(HttpConfig config);
-
-        Response createResponse(Request request);
-
-//        HttpEngine createHttpEngine();
-
-    }
-
     interface OnRedirectListener {
         boolean onRedirect(int redirectCount, String redirectUrl);
-    }
-
-    interface OnErrorListener {
-        void onError(Throwable throwable);
-    }
-
-    interface OnSuccessListener<T> {
-        void onSuccess(T data) throws Exception;
-    }
-
-    interface OnCompleteListener {
-        void onComplete() throws Exception;
-    }
-
-    interface OnSubscribeListener {
-        void onSubscribe(Disposable d) throws Exception;
     }
 
     interface OnStreamWriteListener {
@@ -87,6 +71,48 @@ public interface IHttp {
         boolean shouldContinue();
     }
 
+    interface HttpDispatcher {
+
+        void enqueue(Connection connection, Callback callback);
+
+    }
+
+    interface HttpFactory {
+
+        Request createRequest(HttpConfig config);
+
+        Connection createConnection(Request request);
+
+        Response createResponse(Connection connection);
+
+    }
+
+    interface Connection {
+
+        Request request();
+
+        HttpConfig config();
+
+        Response execute() throws IOException;
+
+        void enqueue(Callback callback);
+
+        InputStream getBodyStream() throws IOException;
+
+        int getStatusCode();
+
+        String getStatusMessage();
+
+        String getContentType();
+
+        long getContentLength();
+
+        Map<String, String> getHeaders();
+
+        void disconnect();
+
+    }
+
 
     /**
      * Represents a HTTP request.
@@ -95,33 +121,7 @@ public interface IHttp {
 
         HttpConfig config();
 
-        Response response() throws Exception;
-
-        Response syncExecute() throws Exception;
-
-        String syncToStr() throws Exception;
-
-        Document syncToHtml() throws Exception;
-
-        JSONObject syncToJsonObject() throws Exception;
-
-        JSONArray syncToJsonArray() throws Exception;
-
-        Document syncToXml() throws Exception;
-
-
-        HttpObserver<Response> execute();
-
-        HttpObserver<String> toStr();
-
-        HttpObserver<Document> toHtml();
-
-        HttpObserver<JSONObject> toJsonObject();
-
-        HttpObserver<JSONArray> toJsonArray();
-
-        HttpObserver<Document> toXml();
-
+        Connection connect();
 
     }
 
@@ -131,8 +131,6 @@ public interface IHttp {
     interface Response {
 
         HttpConfig config();
-
-        Response execute() throws Exception;
 
         boolean hasHeader(String name);
 
@@ -160,38 +158,20 @@ public interface IHttp {
 
         long contentLength();
 
-//        Document parse(Parser parser) throws IOException;
-
-        String body();
-
-        /**
-         * Get the body of the response as an array of bytes.
-         * @return body bytes
-         */
-        byte[] bodyAsBytes();
-
-        /**
-         * Read the body of the response into a local buffer, so that {@link #parse()} may be called repeatedly on the
-         * same connection response (otherwise, once the response is read, its InputStream will have been drained and
-         * may not be re-read). Calling {@link #body() } or {@link #bodyAsBytes()} has the same effect.
-         * @return this response, for chaining
-         * @throws UncheckedIOException if an IO exception occurs during buffering.
-         */
-        Response bufferUp();
-
         /**
          * Get the body of the response as a (buffered) InputStream. You should close the input stream when you're done with it.
          * Other body methods (like bufferUp, body, parse, etc) will not work in conjunction with this method.
          * <p>This method is useful for writing large responses to disk, without buffering them completely into memory first.</p>
          * @return the response body input stream
          */
-        BufferedInputStream bodyStream();
+        InputStream bodyStream() throws IOException;
+
+        <T> T parse(Parser<T> parser) throws IOException;
+
+        String bodyString() throws IOException;
 
         void close();
 
-        void disconnect();
-
-        void closeIO();
     }
 
     /**
@@ -262,6 +242,23 @@ public interface IHttp {
         IHttp.KeyVal setListener(IHttp.OnStreamWriteListener listener);
 
         IHttp.OnStreamWriteListener getListener();
+
+    }
+
+    // TODO Cookie管理
+    interface CookieJar {
+
+        Map<String, String> loadCookies(URL url);
+
+        void saveCookies(URL url, Map<String, String> cookieMap);
+
+    }
+
+    interface Callback {
+
+        void onFailure(Connection conn, IOException e);
+
+        void onResponse(Connection conn, Response response) throws IOException;
 
     }
 

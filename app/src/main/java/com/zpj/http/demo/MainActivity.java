@@ -1,25 +1,17 @@
 package com.zpj.http.demo;
 
-import android.arch.lifecycle.Lifecycle;
 import android.os.Bundle;
-import android.os.Looper;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.zpj.http.ZHttp;
-import com.zpj.http.core.HttpObserver;
 import com.zpj.http.core.IHttp;
-import com.zpj.http.parser.html.nodes.Document;
-import com.zpj.http.parser.html.nodes.Element;
+import com.zpj.http.impl.HttpUrlEngine;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import io.reactivex.disposables.Disposable;
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -180,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
 //                .subscribe();
 
         ZHttp.config()
+                .httpEngine(new HttpUrlEngine())
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.81")
                 .ignoreContentType(true)
                 .init();
@@ -210,12 +203,16 @@ public class MainActivity extends AppCompatActivity {
                 .data("cc", "+86")
                 .data("hash", "3E3B13DB9E139005D57AF059BF9FAF8F")
                 .data("_json", "true")
-                .execute()
-                .onSuccess(new IHttp.OnSuccessListener<IHttp.Response>() {
+                .enqueue(new IHttp.Callback() {
                     @Override
-                    public void onSuccess(IHttp.Response res) throws Exception {
-                        Log.d("MainActivity", "cookies=" + res.cookieStr());
-                        Log.d("MainActivity", "body=" + res.body());
+                    public void onFailure(IHttp.Connection conn, IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onResponse(IHttp.Connection conn, IHttp.Response response) throws IOException {
+                        Log.d("MainActivity", "cookies=" + response.cookieStr());
+                        Log.d("MainActivity", "body=" + response.bodyString());
 //                        ZHttp.get("https://i.mi.com/sts?sign=mF32YtfY7XReThOa0pZzXhZXJ0U%3D&followup=https%3A%2F%2Fi.mi.com%2F&sid=i.mi.com")
 //                                .cookie(res.cookieStr())
 //                                .toStr()
@@ -233,14 +230,7 @@ public class MainActivity extends AppCompatActivity {
 //                                })
 //                                .subscribe();
                     }
-                })
-                .onError(new IHttp.OnErrorListener() {
-                    @Override
-                    public void onError(Throwable throwable) {
-                        throwable.printStackTrace();
-                    }
-                })
-                .subscribe();
+                });
 
 //        ZHttp.get("https://api.heweather.com/x3/weather")
 //                .data("city", "beijing")
