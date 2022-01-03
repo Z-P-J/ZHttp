@@ -2,7 +2,7 @@ package com.zpj.http.parser.ajsoup.kit;
 
 
 import com.zpj.http.parser.ajsoup.annotation.Select;
-import com.zpj.http.parser.html.select.Elements;
+import com.zpj.http.parser.jsoup.select.Elements;
 import com.zpj.http.utils.StringUtil;
 
 import java.lang.annotation.Annotation;

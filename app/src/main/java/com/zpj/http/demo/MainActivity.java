@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import com.zpj.http.ZHttp;
 import com.zpj.http.core.IHttp;
-import com.zpj.http.impl.HttpUrlEngine;
+import com.zpj.http.engine.urlconnection.HttpUrlConnectionEngine;
 
 import java.io.IOException;
 
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
 //                .subscribe();
 
         ZHttp.config()
-                .httpEngine(new HttpUrlEngine())
+                .httpFactory(new HttpUrlConnectionEngine())
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Safari/537.36 Edg/88.0.705.81")
                 .ignoreContentType(true)
                 .init();

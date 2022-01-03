@@ -23,5 +23,6 @@ android {
 }
 
 dependencies {
-    implementation project(':zhttp')
+    implementation project(':zhttp-core')
+    implementation project(':zhttp-parser-jsoup')
 }

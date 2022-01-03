@@ -5,7 +5,7 @@ import com.zpj.http.parser.ajsoup.AJsoupReaderContext;
 import com.zpj.http.parser.ajsoup.annotation.Select;
 import com.zpj.http.parser.ajsoup.decoder.Decoder;
 import com.zpj.http.parser.ajsoup.exception.AJsoupReaderException;
-import com.zpj.http.parser.html.select.Elements;
+import com.zpj.http.parser.jsoup.select.Elements;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;

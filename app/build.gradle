@@ -29,5 +29,8 @@ dependencies {
 //    implementation "io.reactivex.rxjava3:rxjava:3.0.0-RC9"
 
 //    implementation 'com.zpj.http:ZHttp:1.0.0'
-    implementation project(':zhttp')
+//    implementation project(':zhttp')
+    implementation project(':zhttp-core')
+    implementation project(':zhttp-urlconnection')
+    implementation project(':zhttp-parser-jsoup')
 }

@@ -4,8 +4,8 @@ package com.zpj.http.parser.ajsoup;
 import com.zpj.http.parser.ajsoup.annotation.Select;
 import com.zpj.http.parser.ajsoup.data.Resource;
 import com.zpj.http.parser.ajsoup.kit.AnnotationAnalysis;
-import com.zpj.http.parser.html.nodes.Element;
-import com.zpj.http.parser.html.select.Elements;
+import com.zpj.http.parser.jsoup.nodes.Element;
+import com.zpj.http.parser.jsoup.select.Elements;
 import com.zpj.http.utils.StringUtil;
 
 import java.lang.annotation.Annotation;

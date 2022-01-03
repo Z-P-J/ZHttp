@@ -4,8 +4,8 @@ package com.zpj.http.parser.ajsoup.decoder;
 import com.zpj.http.parser.ajsoup.AJsoupReaderContext;
 import com.zpj.http.parser.ajsoup.data.TypeLiteral;
 import com.zpj.http.parser.ajsoup.kit.AnalysisDecoder;
-import com.zpj.http.parser.html.nodes.Element;
-import com.zpj.http.parser.html.select.Elements;
+import com.zpj.http.parser.jsoup.nodes.Element;
+import com.zpj.http.parser.jsoup.select.Elements;
 
 import java.lang.reflect.Constructor;
 
