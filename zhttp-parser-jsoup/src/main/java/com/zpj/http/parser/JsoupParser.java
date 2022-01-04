@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 /**
  * 解析为字符串
@@ -19,12 +20,15 @@ import java.nio.charset.Charset;
  */
 public class JsoupParser implements IHttp.Parser {
 
-    private static final String TAG = "StringParser";
+    private static final String TAG = "JsoupParser";
+
+    private static final Pattern xmlContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?xml.*");
+    private static final Pattern htmlContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?html.*");
 
     @Override
     public boolean accept(IHttp.Response response, Type type) {
-        // TODO
-        return true;
+        return (htmlContentTypeRxp.matcher(response.contentType()).matches()
+                || xmlContentTypeRxp.matcher(response.contentType()).matches()) && type == Document.class;
     }
 
     @Override

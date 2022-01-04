@@ -9,16 +9,18 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.nio.charset.Charset;
+import java.util.regex.Pattern;
 
 /**
  * @author Z-P-J
  */
 public class GsonParser implements IHttp.Parser {
 
+    private static final Pattern jsonContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?json.*");
+
     @Override
     public boolean accept(IHttp.Response response, Type type) {
-        // TODO
-        return true;
+        return jsonContentTypeRxp.matcher(response.contentType()).matches();
     }
 
     @Override

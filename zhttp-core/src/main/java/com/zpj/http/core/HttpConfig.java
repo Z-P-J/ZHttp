@@ -2,6 +2,7 @@ package com.zpj.http.core;
 
 import android.text.TextUtils;
 
+import com.zpj.http.ZHttp;
 import com.zpj.http.utils.UrlUtil;
 import com.zpj.http.utils.Validate;
 
@@ -194,7 +195,7 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
         connection().enqueue(callback);
     }
 
-    public String parseToStr() throws IOException {
+    public String toStr() throws IOException {
         return execute().bodyString();
     }
 
@@ -203,13 +204,11 @@ public class HttpConfig extends BaseConfig<HttpConfig> {
     }
 
     public <T> T parse(Type type) throws IOException {
-        // TODO
-        return null;
+        return execute().parse(type);
     }
 
     public <T> T parse(Class<T> clazz) throws IOException {
-        // TODO
-        return null;
+        return execute().parse(clazz);
     }
 
 }

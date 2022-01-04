@@ -1,5 +1,8 @@
 package com.zpj.http.core;
 
+import android.util.Log;
+
+import com.zpj.http.ZHttp;
 import com.zpj.http.parser.StringParser;
 import com.zpj.http.utils.DataUtil;
 
@@ -15,7 +18,7 @@ public abstract class HttpResponse implements IHttp.Response {
 
     private final String charset;
 
-    private InputStream bodyStream;
+//    private InputStream bodyStream;
 
     protected HttpResponse(IHttp.Connection connection) {
         this.connection = connection;
@@ -28,19 +31,6 @@ public abstract class HttpResponse implements IHttp.Response {
         return config;
     }
 
-//    @Override
-//    public String body() {
-//        prepareByteData();
-//        // charset gets set from header on execute, and from meta-equiv on parse. parse may not have happened yet
-//        String body;
-//        if (charset == null)
-//            body = Charset.forName(DataUtil.defaultCharset).decode(byteData).toString();
-//        else
-//            body = Charset.forName(charset).decode(byteData).toString();
-//        ((Buffer) byteData).rewind(); // cast to avoid covariant return type change in jdk9
-//        return body;
-//    }
-
     @Override
     public InputStream bodyStream() throws IOException {
         return connection.getBodyStream();
@@ -48,41 +38,48 @@ public abstract class HttpResponse implements IHttp.Response {
 
     @Override
     public <T> T parse(IHttp.Parser parser) throws IOException {
-        // TODO
+        if (parser == null) {
+            return null;
+        }
         return (T) parser.parse(this, null);
     }
 
     @Override
     public <T> T parse(Type type) throws IOException {
-        // TODO
-        IHttp.Parser parser = null;
+        IHttp.Parser parser = ZHttp.config().parserFactory().create(this, type);
+        if (parser == null) {
+            return null;
+        }
         return (T) parser.parse(this, type);
     }
 
     @Override
     public <T> T parse(Class<T> clazz) throws IOException {
-        // TODO
-        IHttp.Parser parser = null;
+        Log.d("Test", "test contentType=" + contentType());
+        IHttp.Parser parser = ZHttp.config().parserFactory().create(this, clazz);
+        if (parser == null) {
+            return null;
+        }
         return clazz.cast(parser.parse(this, clazz));
     }
 
     @Override
     public String bodyString() throws IOException {
-        return parse(new StringParser());
+        return new StringParser().parse(this, String.class);
     }
 
     @Override
     public void close() {
         connection.disconnect();
-        if (bodyStream != null) {
-            try {
-                bodyStream.close();
-            } catch (IOException e) {
-                // no-op
-            } finally {
-                bodyStream = null;
-            }
-        }
+//        if (bodyStream != null) {
+//            try {
+//                bodyStream.close();
+//            } catch (IOException e) {
+//                // no-op
+//            } finally {
+//                bodyStream = null;
+//            }
+//        }
     }
 
     @Override

@@ -10,6 +10,9 @@ import android.widget.TextView;
 import com.zpj.http.ZHttp;
 import com.zpj.http.core.IHttp;
 import com.zpj.http.engine.urlconnection.HttpUrlConnectionEngine;
+import com.zpj.http.parser.jsoup.nodes.Document;
+
+import org.json.JSONObject;
 
 import java.io.IOException;
 
@@ -231,6 +234,30 @@ public class MainActivity extends AppCompatActivity {
 //                                .subscribe();
                     }
                 });
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    JSONObject body = ZHttp.post("https://account.xiaomi.com/pass/serviceLoginAuth2")
+                            .data("needTheme", "false")
+                            .data("showActiveX", "false")
+                            .data("serviceParam", "{\"checkSafePhone\":false,\"checkSafeAddress\":false,\"lsrp_score\":0.0}")
+                            .data("callback", "https://i.mi.com/sts?sign=mF32YtfY7XReThOa0pZzXhZXJ0U%3D&followup=https%3A%2F%2Fi.mi.com%2F&sid=i.mi.com")
+                            .data("qs", "%3Fcallback%3Dhttps%253A%252F%252Fi.mi.com%252Fsts%253Fsign%253DmF32YtfY7XReThOa0pZzXhZXJ0U%25253D%2526followup%253Dhttps%25253A%25252F%25252Fi.mi.com%25252F%2526sid%253Di.mi.com%26sid%3Di.mi.com%26_locale%3Dzh_CN%26_snsNone%3Dtrue")
+                            .data("sid", "i.mi.com")
+                            .data("_sign", "9jXUgB/pG9gyrojgrYozJpnskkE=")
+                            .data("user", "15086601665")
+                            .data("cc", "+86")
+                            .data("hash", "3E3B13DB9E139005D57AF059BF9FAF8F")
+                            .data("_json", "true")
+                            .parse(JSONObject.class);
+                    Log.d(TAG, "test body=" + body);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
 
 //        ZHttp.get("https://api.heweather.com/x3/weather")
 //                .data("city", "beijing")

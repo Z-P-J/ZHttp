@@ -5,8 +5,7 @@ import com.zpj.http.core.HttpConfig;
 import com.zpj.http.core.HttpCookieJar;
 import com.zpj.http.core.HttpDispatcher;
 import com.zpj.http.core.IHttp;
-import com.zpj.http.core.HttpParserFactory;
-import com.zpj.http.utils.Validate;
+import com.zpj.http.parser.HttpParserFactory;
 
 public final class ZHttp {
 
@@ -85,17 +84,17 @@ public final class ZHttp {
 
     public static class HttpGlobalConfig extends BaseConfig<HttpGlobalConfig> {
 
-        private IHttp.ParserFactory parserFactory = new HttpParserFactory();
+        private final IHttp.ParserFactory parserFactory = new HttpParserFactory();
 
         private HttpGlobalConfig() {
             cookieJar(new HttpCookieJar());
             httpDispatcher(new HttpDispatcher());
         }
 
-        public HttpGlobalConfig parserFactory(IHttp.ParserFactory parserFactory) {
-            this.parserFactory = parserFactory;
-            return this;
-        }
+//        public HttpGlobalConfig parserFactory(IHttp.ParserFactory parserFactory) {
+//            this.parserFactory = parserFactory;
+//            return this;
+//        }
 
         public IHttp.ParserFactory parserFactory() {
             return parserFactory;
@@ -103,6 +102,11 @@ public final class ZHttp {
 
         public void init() {
             httpFactory().initSSL(allowAllSSL());
+        }
+
+        public HttpGlobalConfig registerHttpParser(IHttp.Parser parser) {
+            parserFactory.register(parser);
+            return this;
         }
 
     }

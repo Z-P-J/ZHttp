@@ -19,7 +19,7 @@ public interface IHttp {
 
         void register(Parser parser);
 
-        Parser create(Type type);
+        Parser create(Response response, Type type);
 
     }
 
