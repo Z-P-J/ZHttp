@@ -1,7 +1,7 @@
 package com.zpj.http.parser.jsoup.nodes;
 
 import com.zpj.http.parser.jsoup.exception.SerializationException;
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 import com.zpj.http.utils.Validate;
 import com.zpj.http.parser.jsoup.CharacterReader;
 import com.zpj.http.parser.jsoup.Parser;

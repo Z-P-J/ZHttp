@@ -1,6 +1,6 @@
 package com.zpj.http.parser.jsoup.select;
 
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 import com.zpj.http.parser.jsoup.nodes.Element;
 
 import java.util.ArrayList;

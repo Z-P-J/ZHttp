@@ -6,7 +6,7 @@ import com.zpj.http.parser.ajsoup.data.Resource;
 import com.zpj.http.parser.ajsoup.kit.AnnotationAnalysis;
 import com.zpj.http.parser.jsoup.nodes.Element;
 import com.zpj.http.parser.jsoup.select.Elements;
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;

@@ -7,8 +7,6 @@ import com.zpj.http.core.HttpConfig;
 import com.zpj.http.core.HttpConnection;
 import com.zpj.http.core.HttpHeader;
 import com.zpj.http.core.IHttp;
-import com.zpj.http.io.ConstrainableInputStream;
-import com.zpj.http.utils.DataUtil;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -43,6 +41,8 @@ public class HttpConnectionImpl extends HttpConnection {
     public static final String MULTIPART_FORM_DATA = "multipart/form-data";
     public static final String FORM_URL_ENCODED = "application/x-www-form-urlencoded";
     public static final String DefaultUploadType = "application/octet-stream";
+
+    private static final int BUFFER_SIZE = 1024 * 512; // 1024 * 32
 
     private HttpURLConnection conn;
 
@@ -143,9 +143,7 @@ public class HttpConnectionImpl extends HttpConnection {
         } else {
             bodyStream = conn.getErrorStream();
         }
-        return ConstrainableInputStream
-                .wrap(bodyStream, DataUtil.bufferSize, config().maxBodySize())
-                .timeout(startTime, config().connectTimeout() + config().readTimeout());
+        return bodyStream;
     }
 
     private boolean hasContentEncoding(String value) {
@@ -161,12 +159,12 @@ public class HttpConnectionImpl extends HttpConnection {
             // if user has set content type to multipart/form-data, auto add boundary.
             if (config().header(HttpHeader.CONTENT_TYPE).contains(MULTIPART_FORM_DATA) &&
                     !config().header(HttpHeader.CONTENT_TYPE).contains("boundary")) {
-                bound = DataUtil.mimeBoundary();
+                bound = Utility.mimeBoundary();
                 config().header(HttpHeader.CONTENT_TYPE, MULTIPART_FORM_DATA + "; boundary=" + bound);
             }
 
         } else if (config().needsMultipart()) {
-            bound = DataUtil.mimeBoundary();
+            bound = Utility.mimeBoundary();
             config().header(HttpHeader.CONTENT_TYPE, MULTIPART_FORM_DATA + "; boundary=" + bound);
         } else {
             config().header(HttpHeader.CONTENT_TYPE, FORM_URL_ENCODED + "; charset=" + config().postDataCharset());
@@ -255,7 +253,7 @@ public class HttpConnectionImpl extends HttpConnection {
                     w.write(multipartHeader.getBytes(charset));
 
                     Log.d("HttpResponse", "crossStreams");
-                    DataUtil.crossStreams(keyVal.inputStream(), w, keyVal.getListener());
+                    crossStreams(keyVal.inputStream(), w, keyVal.getListener());
                     w.flush();
                 } else {
                     multipartHeader += ("\r\n\r\n" + keyVal.value());
@@ -353,6 +351,35 @@ public class HttpConnectionImpl extends HttpConnection {
             conn.addRequestProperty(header.getKey(), header.getValue());
         }
         return conn;
+    }
+
+    /**
+     * Writes the input stream to the output stream. Doesn't close them.
+     * @param in input stream to read from
+     * @param out output stream to write to
+     * @throws IOException on IO error
+     */
+    private void crossStreams(final InputStream in, final OutputStream out, IHttp.OnStreamWriteListener listener) throws IOException {
+        final byte[] buffer = new byte[BUFFER_SIZE];
+        int len;
+        while ((len = in.read(buffer, 0, buffer.length)) != -1) {
+            if (listener == null || listener.shouldContinue()) {
+                Log.d("crossStreams", "len=" + len);
+                out.write(buffer, 0, len);
+                Log.d("crossStreams", "write");
+                out.flush();
+                Log.d("crossStreams", "flush");
+                Log.d("crossStreams", "onBytesWritten");
+                if (listener != null) {
+                    listener.onBytesWritten(len);
+                }
+                Log.d("crossStreams", "----------------------------------------------");
+            } else {
+                Log.d("crossStreams", "stop");
+                throw new IOException("Stop Post by User!");
+            }
+
+        }
     }
 
     private synchronized void initUnSecureTSL(HttpConfig config) throws IOException {

@@ -1,7 +1,7 @@
 package com.zpj.http.parser.jsoup;
 
 import com.zpj.http.utils.Validate;
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 import com.zpj.http.parser.jsoup.nodes.CDataNode;
 import com.zpj.http.parser.jsoup.nodes.Comment;
 import com.zpj.http.parser.jsoup.nodes.DataNode;
@@ -17,7 +17,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.zpj.http.utils.StringUtil.inSorted;
+import static com.zpj.http.parser.jsoup.utils.StringUtil.inSorted;
 
 /**
  * HTML Tree Builder; creates a DOM from Tokens.

@@ -1,6 +1,6 @@
 package com.zpj.http.parser.jsoup;
 
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 import com.zpj.http.parser.jsoup.nodes.Attribute;
 import com.zpj.http.parser.jsoup.nodes.Attributes;
 import com.zpj.http.parser.jsoup.nodes.Document;

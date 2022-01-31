@@ -2,7 +2,7 @@ package com.zpj.http.parser.jsoup.nodes;
 
 import com.zpj.http.parser.jsoup.utils.ChangeNotifyingArrayList;
 import com.zpj.http.utils.Validate;
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 import com.zpj.http.parser.jsoup.ParseSettings;
 import com.zpj.http.parser.jsoup.Tag;
 import com.zpj.http.parser.jsoup.select.Collector;

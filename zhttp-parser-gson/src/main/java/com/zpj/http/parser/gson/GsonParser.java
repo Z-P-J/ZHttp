@@ -16,11 +16,11 @@ import java.util.regex.Pattern;
  */
 public class GsonParser implements IHttp.Parser {
 
-    private static final Pattern jsonContentTypeRxp = Pattern.compile("(application|text)/\\w*\\+?json.*");
+    private static final Pattern JSON_CONTENT_TYPE_RXP = Pattern.compile("(application|text)/\\w*\\+?json.*");
 
     @Override
     public boolean accept(IHttp.Response response, Type type) {
-        return jsonContentTypeRxp.matcher(response.contentType()).matches();
+        return JSON_CONTENT_TYPE_RXP.matcher(response.contentType()).matches();
     }
 
     @Override

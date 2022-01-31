@@ -25,7 +25,6 @@ public final class ZHttp {
                 .debug(config().debug())
                 .headers(config().headers())
                 .bufferSize(config().bufferSize())
-                .maxBodySize(config().maxBodySize())
                 .maxRedirectCount(config().maxRedirectCount())
                 .ignoreHttpErrors(config().ignoreHttpErrors())
                 .ignoreContentType(config().ignoreContentType())
@@ -90,11 +89,6 @@ public final class ZHttp {
             cookieJar(new HttpCookieJar());
             httpDispatcher(new HttpDispatcher());
         }
-
-//        public HttpGlobalConfig parserFactory(IHttp.ParserFactory parserFactory) {
-//            this.parserFactory = parserFactory;
-//            return this;
-//        }
 
         public IHttp.ParserFactory parserFactory() {
             return parserFactory;

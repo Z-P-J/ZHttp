@@ -1,7 +1,6 @@
 package com.zpj.http.parser;
 
 import com.zpj.http.core.IHttp;
-import com.zpj.http.parser.StringParser;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

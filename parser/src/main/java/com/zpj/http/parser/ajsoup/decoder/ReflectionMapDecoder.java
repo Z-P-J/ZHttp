@@ -7,7 +7,7 @@ import com.zpj.http.parser.ajsoup.exception.AJsoupReaderException;
 import com.zpj.http.parser.ajsoup.kit.AnalysisDecoder;
 import com.zpj.http.parser.jsoup.nodes.Element;
 import com.zpj.http.parser.jsoup.select.Elements;
-import com.zpj.http.utils.StringUtil;
+import com.zpj.http.parser.jsoup.utils.StringUtil;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;

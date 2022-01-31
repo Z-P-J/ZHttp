@@ -1,4 +1,6 @@
-package com.zpj.http.utils;
+package com.zpj.http.parser.jsoup.utils;
+
+import com.zpj.http.utils.Validate;
 
 import java.net.MalformedURLException;
 import java.net.URL;

@@ -2,8 +2,6 @@ package com.zpj.http.core;
 
 import android.util.Log;
 
-import com.zpj.http.core.IHttp;
-
 import java.net.URL;
 import java.util.Collections;
 import java.util.HashMap;

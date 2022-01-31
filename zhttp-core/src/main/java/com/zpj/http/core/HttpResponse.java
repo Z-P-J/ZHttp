@@ -3,8 +3,9 @@ package com.zpj.http.core;
 import android.util.Log;
 
 import com.zpj.http.ZHttp;
+import com.zpj.http.constant.Defaults;
 import com.zpj.http.parser.StringParser;
-import com.zpj.http.utils.DataUtil;
+import com.zpj.http.utils.CharsetUtil;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -18,12 +19,10 @@ public abstract class HttpResponse implements IHttp.Response {
 
     private final String charset;
 
-//    private InputStream bodyStream;
-
     protected HttpResponse(IHttp.Connection connection) {
         this.connection = connection;
         this.config = connection.config();
-        this.charset = DataUtil.getCharsetFromContentType(contentType());
+        this.charset = CharsetUtil.getCharsetFromContentType(contentType());
     }
 
     @Override
@@ -71,15 +70,6 @@ public abstract class HttpResponse implements IHttp.Response {
     @Override
     public void close() {
         connection.disconnect();
-//        if (bodyStream != null) {
-//            try {
-//                bodyStream.close();
-//            } catch (IOException e) {
-//                // no-op
-//            } finally {
-//                bodyStream = null;
-//            }
-//        }
     }
 
     @Override
@@ -135,7 +125,7 @@ public abstract class HttpResponse implements IHttp.Response {
     @Override
     public String charset() {
         if (charset == null) {
-            return DataUtil.defaultCharset;
+            return Defaults.CHARSET;
         }
         return charset;
     }

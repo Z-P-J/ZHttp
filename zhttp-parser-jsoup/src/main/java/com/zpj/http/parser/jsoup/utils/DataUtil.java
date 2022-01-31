@@ -3,7 +3,7 @@ package com.zpj.http.parser.jsoup.utils;
 import android.util.Log;
 
 import com.zpj.http.core.IHttp;
-import com.zpj.http.io.ConstrainableInputStream;
+import com.zpj.http.parser.jsoup.io.ConstrainableInputStream;
 import com.zpj.http.parser.jsoup.exception.UncheckedIOException;
 import com.zpj.http.parser.jsoup.nodes.Comment;
 import com.zpj.http.parser.jsoup.nodes.Document;
@@ -12,7 +12,6 @@ import com.zpj.http.parser.jsoup.nodes.Node;
 import com.zpj.http.parser.jsoup.nodes.XmlDeclaration;
 import com.zpj.http.parser.jsoup.Parser;
 import com.zpj.http.parser.jsoup.select.Elements;
-import com.zpj.http.utils.StringUtil;
 import com.zpj.http.utils.Validate;
 
 import java.io.BufferedReader;

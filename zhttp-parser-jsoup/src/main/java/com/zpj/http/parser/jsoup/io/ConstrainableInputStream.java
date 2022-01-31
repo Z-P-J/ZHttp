@@ -1,4 +1,4 @@
-package com.zpj.http.io;
+package com.zpj.http.parser.jsoup.io;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;

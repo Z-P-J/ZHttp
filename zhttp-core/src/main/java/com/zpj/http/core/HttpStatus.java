@@ -64,6 +64,14 @@ public enum HttpStatus {
         return false;
     }
 
+    public int getCode() {
+        return mCode;
+    }
+
+    public String getMessage() {
+        return mMessage;
+    }
+
     public static HttpStatus getValue(int value) {
         for (HttpStatus httpStatus : values()) {
             if (value == httpStatus.mCode) {

@@ -3,9 +3,6 @@ package com.zpj.http.core;
 import android.text.TextUtils;
 
 import com.zpj.http.constant.Defaults;
-import com.zpj.http.utils.DataUtil;
-import com.zpj.http.utils.StringUtil;
-import com.zpj.http.utils.TokenQueue;
 import com.zpj.http.utils.Validate;
 
 import java.net.InetSocketAddress;
@@ -37,13 +34,11 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
      * */
     int bufferSize = Defaults.BUFFER_SIZE;
 
-    long maxBodySize = Defaults.MAX_BODY_SIZE;
-
     boolean ignoreHttpErrors = false;
 
     boolean ignoreContentType = false;
 
-    String postDataCharset = DataUtil.defaultCharset;
+    String postDataCharset = Defaults.CHARSET;
 
 
 
@@ -110,10 +105,6 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
         return bufferSize;
     }
 
-    public long maxBodySize() {
-        return maxBodySize;
-    }
-
     public String postDataCharset() {
         return postDataCharset;
     }
@@ -151,7 +142,7 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
     }
 
     public String cookieStr() {
-        StringBuilder sb = StringUtil.borrowBuilder();
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Map.Entry<String, String> cookie : cookies.entrySet()) {
             if (!first)
@@ -159,9 +150,8 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
             else
                 first = false;
             sb.append(cookie.getKey()).append('=').append(cookie.getValue());
-            // todo: spec says only ascii, no escaping / encoding defined. validate on set? or escape somehow here?
         }
-        return StringUtil.releaseBuilder(sb);
+        return sb.toString();
     }
 
     public int retryDelay() {
@@ -332,11 +322,6 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
         return (T) this;
     }
 
-    public T maxBodySize(long maxBodySize) {
-        this.maxBodySize = maxBodySize;
-        return (T) this;
-    }
-
     public T postDataCharset(String postDataCharset) {
         this.postDataCharset = postDataCharset;
         return (T) this;
@@ -366,11 +351,17 @@ public abstract class BaseConfig<T extends BaseConfig<T>> {
 
     public T cookie(String cookie) {
         if (!TextUtils.isEmpty(cookie)) {
-            TokenQueue cd = new TokenQueue(cookie);
-            while (!cd.isEmpty()) {
-                String cookieName = cd.chompTo("=").trim();
-                String cookieVal = cd.consumeTo(";").trim();
-                cd.chompTo(";");
+            String[] arr = cookie.split(";");
+            for (String str : arr) {
+                int index = str.indexOf("=");
+                if (index < 0) {
+                    continue;
+                }
+                String cookieName = str.substring(0, index).trim();
+                if (cookieName.isEmpty()) {
+                    continue;
+                }
+                String cookieVal = str.substring(index + 1).trim();
                 cookie(cookieName, cookieVal);
             }
         }

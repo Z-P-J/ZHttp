@@ -7,7 +7,7 @@ public class Defaults {
 
     public static final int BUFFER_SIZE = 1024;
 
-    public static final int MAX_BODY_SIZE = 0;
+    public static final String CHARSET = "UTF-8";
 
     /**
      * 默认UserAgent
